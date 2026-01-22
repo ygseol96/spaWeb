@@ -217,42 +217,42 @@
     </style>
 </head>
 <body>
-    <!-- 헤더 -->
-    <header class="header">
-        <div class="header-content">
-            <div class="logo">SPA System</div>
-            <div class="user-info">
-                <span class="username" id="userDisplay">사용자</span>
-                <button class="logout-btn" id="logoutBtn">로그아웃</button>
-            </div>
-        </div>
-    </header>
-
-    <!-- GNB (Global Navigation Bar) -->
-    <nav class="gnb">
-        <div class="gnb-content">
-            <a href="#home" class="gnb-item active" data-page="home">홈</a>
-            <a href="#dashboard" class="gnb-item" data-page="dashboard">대시보드</a>
-            <a href="#data" class="gnb-item" data-page="data">데이터 관리</a>
-            <a href="#settings" class="gnb-item" data-page="settings">설정</a>
-        </div>
-    </nav>
-
-    <!-- 컨텐츠 영역 -->
-    <div class="container">
-        <div class="content-area" id="contentArea">
-            <!-- 동적으로 로드될 컨텐츠 -->
+<!-- 헤더 -->
+<header class="header">
+    <div class="header-content">
+        <div class="logo">SPA System</div>
+        <div class="user-info">
+            <span class="username" id="userDisplay">사용자</span>
+            <button class="logout-btn" id="logoutBtn">로그아웃</button>
         </div>
     </div>
+</header>
 
-    <script>
-        // 로그아웃 기능
-        document.getElementById('logoutBtn').addEventListener('click', function() {
-            if (confirm('로그아웃 하시겠습니까?')) {
-                // 서블릿으로 로그아웃 요청
-                fetch('logout', {
-                    method: 'POST'
-                })
+<!-- GNB (Global Navigation Bar) -->
+<nav class="gnb">
+    <div class="gnb-content">
+        <a class="gnb-item active" data-page="home" href="#home">홈</a>
+        <a class="gnb-item" data-page="dashboard" href="#dashboard">대시보드</a>
+        <a class="gnb-item" data-page="data" href="#data">데이터 관리</a>
+        <a class="gnb-item" data-page="settings" href="#settings">설정</a>
+    </div>
+</nav>
+
+<!-- 컨텐츠 영역 -->
+<div class="container">
+    <div class="content-area" id="contentArea">
+        <!-- 동적으로 로드될 컨텐츠 -->
+    </div>
+</div>
+
+<script>
+    // 로그아웃 기능
+    document.getElementById('logoutBtn').addEventListener('click', function () {
+        if (confirm('로그아웃 하시겠습니까?')) {
+            // 서블릿으로 로그아웃 요청
+            fetch('logout', {
+                method: 'POST'
+            })
                 .then(() => {
                     window.location.href = 'login.html';
                 })
@@ -261,14 +261,14 @@
                     // 오류가 발생해도 로그인 페이지로 이동
                     window.location.href = 'login.html';
                 });
-            }
-        });
+        }
+    });
 
-        // 페이지 컨텐츠 정의
-        const pages = {
-            home: {
-                title: '홈',
-                content: `
+    // 페이지 컨텐츠 정의
+    const pages = {
+        home: {
+            title: '홈',
+            content: `
                     <div class="page-content">
                         <p>환영합니다! SPA 해시 라우팅 시스템입니다.</p>
                         <div class="stats-grid">
@@ -309,10 +309,10 @@
                         </div>
                     </div>
                 `
-            },
-            dashboard: {
-                title: '대시보드',
-                content: `
+        },
+        dashboard: {
+            title: '대시보드',
+            content: `
                     <div class="page-content">
                         <p>실시간 데이터와 통계를 확인할 수 있습니다.</p>
                         <div class="stats-grid">
@@ -371,10 +371,10 @@
                         </table>
                     </div>
                 `
-            },
-            data: {
-                title: '데이터 관리',
-                content: `
+        },
+        data: {
+            title: '데이터 관리',
+            content: `
                     <div class="page-content">
                         <p>데이터를 조회하고 관리할 수 있습니다.</p>
                         <table class="data-table">
@@ -427,10 +427,10 @@
                         </table>
                     </div>
                 `
-            },
-            settings: {
-                title: '설정',
-                content: `
+        },
+        settings: {
+            title: '설정',
+            content: `
                     <div class="page-content">
                         <p>시스템 설정을 관리할 수 있습니다.</p>
                         <div class="card-grid">
@@ -461,46 +461,46 @@
                         </div>
                     </div>
                 `
-            }
-        };
+        }
+    };
 
-        // 해시 라우터 함수
-        function loadPage(pageName) {
-            const page = pages[pageName] || pages.home;
-            const contentArea = document.getElementById('contentArea');
+    // 해시 라우터 함수
+    function loadPage(pageName) {
+        const page = pages[pageName] || pages.home;
+        const contentArea = document.getElementById('contentArea');
 
-            contentArea.innerHTML = `
+        contentArea.innerHTML = `
                 <h1 class="page-title">${page.title}</h1>
                 ${page.content}
             `;
 
-            // GNB 활성화 상태 업데이트
-            document.querySelectorAll('.gnb-item').forEach(item => {
-                item.classList.remove('active');
-                if (item.dataset.page === pageName) {
-                    item.classList.add('active');
-                }
-            });
-        }
-
-        // 해시 변경 이벤트 리스너
-        window.addEventListener('hashchange', function() {
-            const hash = window.location.hash.substring(1) || 'home';
-            loadPage(hash);
-        });
-
-        // GNB 클릭 이벤트
+        // GNB 활성화 상태 업데이트
         document.querySelectorAll('.gnb-item').forEach(item => {
-            item.addEventListener('click', function(e) {
-                e.preventDefault();
-                const pageName = this.dataset.page;
-                window.location.hash = pageName;
-            });
+            item.classList.remove('active');
+            if (item.dataset.page === pageName) {
+                item.classList.add('active');
+            }
         });
+    }
 
-        // 초기 페이지 로드
-        const initialHash = window.location.hash.substring(1) || 'home';
-        loadPage(initialHash);
-    </script>
+    // 해시 변경 이벤트 리스너
+    window.addEventListener('hashchange', function () {
+        const hash = window.location.hash.substring(1) || 'home';
+        loadPage(hash);
+    });
+
+    // GNB 클릭 이벤트
+    document.querySelectorAll('.gnb-item').forEach(item => {
+        item.addEventListener('click', function (e) {
+            e.preventDefault();
+            const pageName = this.dataset.page;
+            window.location.hash = pageName;
+        });
+    });
+
+    // 초기 페이지 로드
+    const initialHash = window.location.hash.substring(1) || 'home';
+    loadPage(initialHash);
+</script>
 </body>
 </html>

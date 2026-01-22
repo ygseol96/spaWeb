@@ -31,12 +31,27 @@ public class SessionCheckFilter implements Filter {
             ".css", ".js", ".jpg", ".jpeg", ".png", ".gif", ".ico", ".svg", ".woff", ".woff2", ".ttf"
     );
 
+    /**
+     * Init.
+     *
+     * @param filterConfig the filter config
+     * @throws ServletException the servlet exception
+     */
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
         // 필터 초기화 (필요시 설정 로드)
         System.out.println("SessionCheckFilter initialized");
     }
 
+    /**
+     * Do filter.
+     *
+     * @param request  the request
+     * @param response the response
+     * @param chain    the chain
+     * @throws IOException      the io exception
+     * @throws ServletException the servlet exception
+     */
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
             throws IOException, ServletException {
@@ -79,7 +94,7 @@ public class SessionCheckFilter implements Filter {
             String acceptHeader = httpRequest.getHeader("Accept");
 
             if ("XMLHttpRequest".equals(requestedWith) ||
-                (acceptHeader != null && acceptHeader.contains("application/json"))) {
+                    (acceptHeader != null && acceptHeader.contains("application/json"))) {
                 // AJAX 요청인 경우 JSON 응답
                 httpResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                 httpResponse.setContentType("application/json; charset=UTF-8");
@@ -91,6 +106,9 @@ public class SessionCheckFilter implements Filter {
         }
     }
 
+    /**
+     * Destroy.
+     */
     @Override
     public void destroy() {
         // 필터 종료 시 정리 작업

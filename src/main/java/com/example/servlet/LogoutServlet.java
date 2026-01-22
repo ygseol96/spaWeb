@@ -17,12 +17,28 @@ import java.io.PrintWriter;
 @WebServlet("/logout")
 public class LogoutServlet extends HttpServlet {
 
+    /**
+     * Do post.
+     *
+     * @param request  the request
+     * @param response the response
+     * @throws ServletException the servlet exception
+     * @throws IOException      the io exception
+     */
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         handleLogout(request, response);
     }
 
+    /**
+     * Do get.
+     *
+     * @param request  the request
+     * @param response the response
+     * @throws ServletException the servlet exception
+     * @throws IOException      the io exception
+     */
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {

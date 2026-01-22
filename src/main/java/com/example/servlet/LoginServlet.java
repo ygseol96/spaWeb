@@ -17,6 +17,14 @@ import java.io.PrintWriter;
 @WebServlet("/login")
 public class LoginServlet extends HttpServlet {
 
+    /**
+     * Do post.
+     *
+     * @param request  the request
+     * @param response the response
+     * @throws ServletException the servlet exception
+     * @throws IOException      the io exception
+     */
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -33,7 +41,7 @@ public class LoginServlet extends HttpServlet {
 
         // 입력값 검증
         if (username == null || username.trim().isEmpty() ||
-            password == null || password.trim().isEmpty()) {
+                password == null || password.trim().isEmpty()) {
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             out.print("{\"success\": false, \"message\": \"아이디와 비밀번호를 입력해주세요.\"}");
             return;
@@ -61,6 +69,14 @@ public class LoginServlet extends HttpServlet {
         }
     }
 
+    /**
+     * Do get.
+     *
+     * @param request  the request
+     * @param response the response
+     * @throws ServletException the servlet exception
+     * @throws IOException      the io exception
+     */
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
