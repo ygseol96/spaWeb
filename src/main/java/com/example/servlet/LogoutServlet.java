@@ -14,63 +14,73 @@ import java.io.PrintWriter;
  * 로그아웃 처리 서블릿
  * 세션을 무효화하고 로그인 페이지로 리다이렉트합니다.
  */
-@WebServlet("/logout")
+@WebServlet ("/logout")
 public class LogoutServlet extends HttpServlet {
 
     /**
      * Do post.
      *
-     * @param request  the request
-     * @param response the response
-     * @throws ServletException the servlet exception
-     * @throws IOException      the io exception
+     * @param request
+     *         the request
+     * @param response
+     *         the response
+     *
+     * @throws ServletException
+     *         the servlet exception
+     * @throws IOException
+     *         the io exception
      */
     @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+    protected void doPost (HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        handleLogout(request, response);
+        handleLogout (request, response);
     }
 
     /**
      * Do get.
      *
-     * @param request  the request
-     * @param response the response
-     * @throws ServletException the servlet exception
-     * @throws IOException      the io exception
+     * @param request
+     *         the request
+     * @param response
+     *         the response
+     *
+     * @throws ServletException
+     *         the servlet exception
+     * @throws IOException
+     *         the io exception
      */
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+    protected void doGet (HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        handleLogout(request, response);
+        handleLogout (request, response);
     }
 
     /**
      * 로그아웃 처리 메서드
      */
-    private void handleLogout(HttpServletRequest request, HttpServletResponse response)
+    private void handleLogout (HttpServletRequest request, HttpServletResponse response)
             throws IOException {
 
         // 세션 가져오기 (없으면 null 반환)
-        HttpSession session = request.getSession(false);
+        HttpSession session = request.getSession (false);
 
         if (session != null) {
             // 세션 무효화
-            session.invalidate();
+            session.invalidate ();
         }
 
         // Accept 헤더 확인하여 JSON 또는 리다이렉트 응답
-        String acceptHeader = request.getHeader("Accept");
+        String acceptHeader = request.getHeader ("Accept");
 
-        if (acceptHeader != null && acceptHeader.contains("application/json")) {
+        if (acceptHeader != null && acceptHeader.contains ("application/json")) {
             // JSON 응답
-            response.setContentType("application/json; charset=UTF-8");
-            response.setStatus(HttpServletResponse.SC_OK);
-            PrintWriter out = response.getWriter();
-            out.print("{\"success\": true, \"message\": \"로그아웃되었습니다.\"}");
+            response.setContentType ("application/json; charset=UTF-8");
+            response.setStatus (HttpServletResponse.SC_OK);
+            PrintWriter out = response.getWriter ();
+            out.print ("{\"success\": true, \"message\": \"로그아웃되었습니다.\"}");
         } else {
             // 로그인 페이지로 리다이렉트
-            response.sendRedirect(request.getContextPath() + "/login.html");
+            response.sendRedirect (request.getContextPath () + "/login.html");
         }
     }
 }
