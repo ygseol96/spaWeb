@@ -4,8 +4,7 @@
 <%@ page import="java.io.*" %>
 <%@ page import="java.util.*" %>
 <%
-    // JSP 브릿지: Servlet으로 요청을 전달
+    // JSON 응답 설정
     response.setContentType("application/json");
     response.setCharacterEncoding("UTF-8");
-    request.getRequestDispatcher("/work").forward(request, response);
 %>
