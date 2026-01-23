@@ -11,9 +11,7 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * 세션 체크 필터
- * 로그인이 필요한 페이지에 접근 시 세션을 확인하고,
- * 세션이 없으면 로그인 페이지로 리다이렉트합니다.
+ * The type Session check filter.
  */
 @WebFilter ("/*")
 public class SessionCheckFilter implements Filter {
@@ -34,11 +32,9 @@ public class SessionCheckFilter implements Filter {
     /**
      * Init.
      *
-     * @param filterConfig
-     *         the filter config
+     * @param filterConfig the filter config
      *
-     * @throws ServletException
-     *         the servlet exception
+     * @throws ServletException the servlet exception
      */
     @Override
     public void init (FilterConfig filterConfig) throws ServletException {
@@ -49,17 +45,12 @@ public class SessionCheckFilter implements Filter {
     /**
      * Do filter.
      *
-     * @param request
-     *         the request
-     * @param response
-     *         the response
-     * @param chain
-     *         the chain
+     * @param request  the request
+     * @param response the response
+     * @param chain    the chain
      *
-     * @throws IOException
-     *         the io exception
-     * @throws ServletException
-     *         the servlet exception
+     * @throws IOException      the io exception
+     * @throws ServletException the servlet exception
      */
     @Override
     public void doFilter (ServletRequest request, ServletResponse response, FilterChain chain)

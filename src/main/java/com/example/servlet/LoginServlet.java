@@ -11,8 +11,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 
 /**
- * 로그인 처리 서블릿
- * POST 요청으로 사용자 인증을 처리하고 세션을 생성합니다.
+ * The type Login servlet.
  */
 @WebServlet ("/login")
 public class LoginServlet extends HttpServlet {
@@ -20,15 +19,11 @@ public class LoginServlet extends HttpServlet {
     /**
      * Do post.
      *
-     * @param request
-     *         the request
-     * @param response
-     *         the response
+     * @param request  the request
+     * @param response the response
      *
-     * @throws ServletException
-     *         the servlet exception
-     * @throws IOException
-     *         the io exception
+     * @throws ServletException the servlet exception
+     * @throws IOException      the io exception
      */
     @Override
     protected void doPost (HttpServletRequest request, HttpServletResponse response)
@@ -77,15 +72,11 @@ public class LoginServlet extends HttpServlet {
     /**
      * Do get.
      *
-     * @param request
-     *         the request
-     * @param response
-     *         the response
+     * @param request  the request
+     * @param response the response
      *
-     * @throws ServletException
-     *         the servlet exception
-     * @throws IOException
-     *         the io exception
+     * @throws ServletException the servlet exception
+     * @throws IOException      the io exception
      */
     @Override
     protected void doGet (HttpServletRequest request, HttpServletResponse response)

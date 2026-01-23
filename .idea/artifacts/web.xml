@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="exploded-war" build-on-make="true" name="web">
+    <output-path>$PROJECT_DIR$/src/main/webapp/artifacts/web</output-path>
+    <root id="root">
+      <element id="library" level="project" name="lib1" />
+    </root>
+  </artifact>
+</component>

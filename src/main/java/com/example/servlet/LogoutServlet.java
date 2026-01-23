@@ -11,8 +11,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 
 /**
- * 로그아웃 처리 서블릿
- * 세션을 무효화하고 로그인 페이지로 리다이렉트합니다.
+ * The type Logout servlet.
  */
 @WebServlet ("/logout")
 public class LogoutServlet extends HttpServlet {
@@ -20,15 +19,11 @@ public class LogoutServlet extends HttpServlet {
     /**
      * Do post.
      *
-     * @param request
-     *         the request
-     * @param response
-     *         the response
+     * @param request  the request
+     * @param response the response
      *
-     * @throws ServletException
-     *         the servlet exception
-     * @throws IOException
-     *         the io exception
+     * @throws ServletException the servlet exception
+     * @throws IOException      the io exception
      */
     @Override
     protected void doPost (HttpServletRequest request, HttpServletResponse response)
@@ -39,15 +34,11 @@ public class LogoutServlet extends HttpServlet {
     /**
      * Do get.
      *
-     * @param request
-     *         the request
-     * @param response
-     *         the response
+     * @param request  the request
+     * @param response the response
      *
-     * @throws ServletException
-     *         the servlet exception
-     * @throws IOException
-     *         the io exception
+     * @throws ServletException the servlet exception
+     * @throws IOException      the io exception
      */
     @Override
     protected void doGet (HttpServletRequest request, HttpServletResponse response)

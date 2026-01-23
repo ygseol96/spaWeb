@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/../../../../../apache-tomcat-10.1.50/lib/lib.iml" filepath="$PROJECT_DIR$/../../../../../apache-tomcat-10.1.50/lib/lib.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../../../../../tomcat 10.1.50-windows/apache-tomcat-10.1.50/lib/lib.iml" filepath="$PROJECT_DIR$/../../../../../tomcat 10.1.50-windows/apache-tomcat-10.1.50/lib/lib.iml" />
     </modules>
   </component>
 </project>
