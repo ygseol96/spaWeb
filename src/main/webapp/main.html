@@ -1,9 +1,9 @@
-<!DOCTYPE html>
-<html lang="ko">
+
 <head>
     <meta charset="UTF-8">
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
     <title>SPA Main</title>
+    <!-- jQuery 라이브러리 -->
     <style>
         * {
             margin: 0;
@@ -214,13 +214,132 @@
             font-size: 14px;
             opacity: 0.9;
         }
+
+        /* 주말근무 그리드 스타일 */
+        .weekend-work-grid {
+            margin-top: 20px;
+        }
+
+        .grid-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .grid-info {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .grid-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .grid-table thead {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .grid-table th {
+            padding: 15px 12px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .grid-table td {
+            padding: 12px;
+            border-bottom: 1px solid #f0f0f0;
+            font-size: 14px;
+            color: #333;
+        }
+
+        .grid-table tbody tr:hover {
+            background-color: #f8f9ff;
+        }
+
+        .grid-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .status-approved {
+            background-color: #d4edda;
+            color: #155724;
+        }
+
+        .status-pending {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+
+        .status-rejected {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+
+        /* 페이징 스타일 */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 5px;
+            margin-top: 20px;
+        }
+
+        .pagination button {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            background: white;
+            color: #333;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .pagination button:hover:not(:disabled) {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .pagination button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .pagination button.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .pagination .page-info {
+            padding: 8px 12px;
+            color: #666;
+            font-size: 14px;
+        }
     </style>
 </head>
 <body>
 <!-- 헤더 -->
 <header class="header">
     <div class="header-content">
-        <div class="logo">SPA System</div>
+        <div class="logo">일용직 주말 근태관리 시스템</div>
         <div class="user-info">
             <span class="username" id="userDisplay">사용자</span>
             <button class="logout-btn" id="logoutBtn">로그아웃</button>
@@ -231,7 +350,7 @@
 <!-- GNB (Global Navigation Bar) -->
 <nav class="gnb">
     <div class="gnb-content">
-        <a class="gnb-item active" data-page="home" href="#home">홈</a>
+        <a class="gnb-item active" data-page="api/work" href="#api/work">홈</a>
         <a class="gnb-item" data-page="dashboard" href="#dashboard">대시보드</a>
         <a class="gnb-item" data-page="data" href="#data">데이터 관리</a>
         <a class="gnb-item" data-page="settings" href="#settings">설정</a>
@@ -267,48 +386,17 @@
     // 페이지 컨텐츠 정의
     const pages = {
         home: {
-            title: '홈',
+            title: '주말근무 관리',
             content: `
                     <div class="page-content">
-                        <p>환영합니다! SPA 해시 라우팅 시스템입니다.</p>
-                        <div class="stats-grid">
-                            <div class="stat-card">
-                                <div class="stat-value">1,234</div>
-                                <div class="stat-label">총 방문자</div>
-                            </div>
-                            <div class="stat-card">
-                                <div class="stat-value">567</div>
-                                <div class="stat-label">오늘 방문자</div>
-                            </div>
-                            <div class="stat-card">
-                                <div class="stat-value">89</div>
-                                <div class="stat-label">신규 사용자</div>
-                            </div>
-                            <div class="stat-card">
-                                <div class="stat-value">42</div>
-                                <div class="stat-label">활성 세션</div>
-                            </div>
-                        </div>
-                        <div class="card-grid">
-                            <div class="card">
-                                <div class="card-title">빠른 시작</div>
-                                <div class="card-description">시스템을 시작하는 방법을 알아보세요.</div>
-                            </div>
-                            <div class="card">
-                                <div class="card-title">최근 업데이트</div>
-                                <div class="card-description">최신 기능과 개선사항을 확인하세요.</div>
-                            </div>
-                            <div class="card">
-                                <div class="card-title">도움말</div>
-                                <div class="card-description">자주 묻는 질문과 가이드를 확인하세요.</div>
-                            </div>
-                            <div class="card">
-                                <div class="card-title">공지사항</div>
-                                <div class="card-description">중요한 공지사항을 확인하세요.</div>
+                        <div id="weekendWorkGrid">
+                            <div style="text-align: center; padding: 40px; color: #999;">
+                                데이터를 불러오는 중...
                             </div>
                         </div>
                     </div>
-                `
+                `,
+            onLoad: loadWeekendWorkData
         },
         dashboard: {
             title: '대시보드',
@@ -370,7 +458,7 @@
                             </tbody>
                         </table>
                     </div>
-                `
+                `,
         },
         data: {
             title: '데이터 관리',
@@ -464,6 +552,150 @@
         }
     };
 
+    // 주말근무 데이터 로드 함수
+    let currentPage = 1;
+    const pageSize = 10;
+
+    function loadWeekendWorkData(page = 1) {
+        currentPage = page;
+
+        // GET 요청의 쿼리 파라미터를 URL에 추가
+        const url = `api/work.jsp`;
+
+        fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    renderWeekendWorkGrid(data.data, data.pagination);
+                } else {
+                    showError('데이터를 불러오는데 실패했습니다.');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showError('서버 오류가 발생했습니다.');
+            });
+    }
+
+    function renderWeekendWorkGrid(dataList, pagination) {
+        const gridContainer = document.getElementById('weekendWorkGrid');
+
+        if (!dataList || dataList.length === 0) {
+            gridContainer.innerHTML = `
+                <div style="text-align: center; padding: 40px; color: #999;">
+                    등록된 주말근무 데이터가 없습니다.
+                </div>
+            `;
+            return;
+        }
+
+        let html = `
+            <div class="weekend-work-grid">
+                <div class="grid-controls">
+                    <div class="grid-info">
+                        전체 ${pagination.totalCount}건 (${pagination.currentPage} / ${pagination.totalPages} 페이지)
+                    </div>
+                </div>
+                <table class="grid-table">
+                    <thead>
+                        <tr>
+                            <th>번호</th>
+                            <th>직원명</th>
+                            <th>부서</th>
+                            <th>근무일자</th>
+                            <th>시작시간</th>
+                            <th>종료시간</th>
+                            <th>근무시간</th>
+                            <th>근무유형</th>
+                            <th>근무사유</th>
+                            <th>상태</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+        `;
+
+        dataList.forEach(item => {
+            const statusClass = item.status === 'APPROVED' ? 'status-approved' :
+                              item.status === 'PENDING' ? 'status-pending' : 'status-rejected';
+            const statusText = item.status === 'APPROVED' ? '승인' :
+                             item.status === 'PENDING' ? '대기' : '반려';
+
+            html += `
+                <tr>
+                    <td>${item.id}</td>
+                    <td>${item.employeeName}</td>
+                    <td>${item.department}</td>
+                    <td>${item.workDate}</td>
+                    <td>${item.startTime}</td>
+                    <td>${item.endTime}</td>
+                    <td>${item.workHours}시간</td>
+                    <td>${item.workType}</td>
+                    <td>${item.reason || '-'}</td>
+                    <td><span class="status-badge ${statusClass}">${statusText}</span></td>
+                </tr>
+            `;
+        });
+
+        html += `
+                    </tbody>
+                </table>
+                ${renderPagination(pagination)}
+            </div>
+        `;
+
+        gridContainer.innerHTML = html;
+    }
+
+    function renderPagination(pagination) {
+        const { currentPage, totalPages } = pagination;
+        let html = '<div class="pagination">';
+
+        // 이전 버튼
+        html += `<button onclick="loadWeekendWorkData(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''}>이전</button>`;
+
+        // 페이지 번호
+        const startPage = Math.max(1, currentPage - 2);
+        const endPage = Math.min(totalPages, currentPage + 2);
+
+        if (startPage > 1) {
+            html += `<button onclick="loadWeekendWorkData(1)">1</button>`;
+            if (startPage > 2) {
+                html += `<span class="page-info">...</span>`;
+            }
+        }
+
+        for (let i = startPage; i <= endPage; i++) {
+            html += `<button onclick="loadWeekendWorkData(${i})" class="${i === currentPage ? 'active' : ''}">${i}</button>`;
+        }
+
+        if (endPage < totalPages) {
+            if (endPage < totalPages - 1) {
+                html += `<span class="page-info">...</span>`;
+            }
+            html += `<button onclick="loadWeekendWorkData(${totalPages})">${totalPages}</button>`;
+        }
+
+        // 다음 버튼
+        html += `<button onclick="loadWeekendWorkData(${currentPage + 1})" ${currentPage === totalPages ? 'disabled' : ''}>다음</button>`;
+
+        html += '</div>';
+        return html;
+    }
+
+    function showError(message) {
+        const gridContainer = document.getElementById('weekendWorkGrid');
+        gridContainer.innerHTML = `
+            <div style="text-align: center; padding: 40px; color: #e74c3c;">
+                ${message}
+            </div>
+        `;
+    }
+
     // 해시 라우터 함수
     function loadPage(pageName) {
         const page = pages[pageName] || pages.home;
@@ -471,8 +703,7 @@
 
         contentArea.innerHTML = `
                 <h1 class="page-title">${page.title}</h1>
-                ${page.content}
-            `;
+                ${page.content}`;
 
         // GNB 활성화 상태 업데이트
         document.querySelectorAll('.gnb-item').forEach(item => {
@@ -481,6 +712,11 @@
                 item.classList.add('active');
             }
         });
+
+        // 페이지별 onLoad 함수 실행
+        if (page.onLoad && typeof page.onLoad === 'function') {
+            page.onLoad();
+        }
     }
 
     // 해시 변경 이벤트 리스너

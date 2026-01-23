@@ -13,7 +13,7 @@ import java.util.List;
 /**
  * The type Session check filter.
  */
-@WebFilter ("/*")
+@WebFilter (urlPatterns = {"/*", "/api/*"})
 public class SessionCheckFilter implements Filter {
 
     // 로그인 없이 접근 가능한 URL 패턴
@@ -21,7 +21,13 @@ public class SessionCheckFilter implements Filter {
             "/login.html",
             "/login",
             "/index.html",
-            "/logout"
+            "/work.jsp",
+            "/work",
+            "/logout",
+            "/api/work.jsp",
+            "/api/work",
+            "/api/login.jsp",
+            "/api/login"
     );
 
     // 정적 리소스 확장자
@@ -99,9 +105,6 @@ public class SessionCheckFilter implements Filter {
                 httpResponse.setStatus (HttpServletResponse.SC_UNAUTHORIZED);
                 httpResponse.setContentType ("application/json; charset=UTF-8");
                 httpResponse.getWriter ().write ("{\"success\": false, \"message\": \"로그인이 필요합니다.\", \"redirect\": \"/login.html\"}");
-            } else {
-                // 일반 요청인 경우 로그인 페이지로 리다이렉트
-                httpResponse.sendRedirect (contextPath + "/login.html");
             }
         }
     }

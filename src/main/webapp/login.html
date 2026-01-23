@@ -132,8 +132,8 @@
         const password = document.getElementById('password').value;
         const errorMessage = document.getElementById('errorMessage');
 
-        // 서블릿으로 로그인 요청
-        fetch('login', {
+        // JSP로 로그인 요청
+        fetch('api/login.jsp', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded',

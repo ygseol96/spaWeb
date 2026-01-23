@@ -1,0 +1,30 @@
+{
+  "LOGIN_SUCCESS": {
+    "code": "LOGIN_001",
+    "message": "로그인에 성공했습니다."
+  },
+  "LOGIN_FAILED": {
+    "code": "LOGIN_002",
+    "message": "아이디 또는 비밀번호가 올바르지 않습니다."
+  },
+  "LOGIN_REQUIRED": {
+    "code": "LOGIN_003",
+    "message": "아이디와 비밀번호를 입력해주세요."
+  },
+  "LOGIN_ERROR": {
+    "code": "LOGIN_004",
+    "message": "로그인 처리 중 오류가 발생했습니다."
+  },
+  "ACCOUNT_INACTIVE": {
+    "code": "LOGIN_005",
+    "message": "비활성화된 계정입니다."
+  },
+  "DB_CONNECTION_ERROR": {
+    "code": "DB_001",
+    "message": "데이터베이스 연결에 실패했습니다."
+  },
+  "DB_QUERY_ERROR": {
+    "code": "DB_002",
+    "message": "데이터베이스 조회 중 오류가 발생했습니다."
+  }
+}
