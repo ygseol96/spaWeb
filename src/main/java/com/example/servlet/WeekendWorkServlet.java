@@ -21,10 +21,17 @@ import java.util.Map;
 /**
  * 주말근무 서블릿 - SPA 형태로 직접 DB 처리
  */
+
+
 @WebServlet("/weekend-work")
 public class WeekendWorkServlet extends HttpServlet {
 
     private final Gson gson = new Gson();
+    private final Connection conn; //여러 요청에서 공유할 수 있는 싱글톤
+
+    public WeekendWorkServlet () throws SQLException {
+        conn = DBConnection.getConnection();
+    }
 
     /**
      * GET 요청 처리 - 주말근무 목록 조회 (페이징)
@@ -74,6 +81,7 @@ public class WeekendWorkServlet extends HttpServlet {
             responseData.put("pagination", pagination);
 
             response.setStatus(HttpServletResponse.SC_OK);
+            conn.close();
             out.print(gson.toJson(responseData));
 
         } catch (NumberFormatException e) {
@@ -89,6 +97,8 @@ public class WeekendWorkServlet extends HttpServlet {
             error.addProperty("success", false);
             error.addProperty("message", "서버 오류가 발생했습니다: " + e.getMessage());
             out.print(gson.toJson(error));
+        } finally {
+            out.close();
         }
     }
 
@@ -157,8 +167,7 @@ public class WeekendWorkServlet extends HttpServlet {
      */
     private int getTotalCount() {
         String sql = "SELECT COUNT(*) FROM tbl_weekend_work";
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql);
+        try (PreparedStatement pstmt = conn.prepareStatement(sql);
              ResultSet rs = pstmt.executeQuery()) {
 
             if (rs.next()) {
@@ -177,15 +186,14 @@ public class WeekendWorkServlet extends HttpServlet {
      * @param size 페이지당 레코드 수
      * @return 주말근무 목록
      */
-    private List<Map<String, Object>> getWeekendWorkList(int page, int size) {
+    private List<Map<String, Object>> getWeekendWorkList(int page, int size) throws java.sql.SQLException {
         List<Map<String, Object>> list = new ArrayList<>();
         int offset = (page - 1) * size;
 
-        String sql = "SELECT * FROM tbl_weekend_work ORDER BY idx";
-
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
-
+        String sql = "SELECT * FROM tbl_weekend_work ORDER BY idx LIMIT ?, OFFSET ?";
+        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setInt(1, offset);
+            pstmt.setInt(2, size);
 
             try (ResultSet rs = pstmt.executeQuery()) {
                 while (rs.next()) {

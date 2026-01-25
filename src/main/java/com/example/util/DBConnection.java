@@ -33,20 +33,4 @@ public class DBConnection {
     public static Connection getConnection () throws SQLException {
         return DriverManager.getConnection (URL, USER, PASSWORD);
     }
-
-    /**
-     * 연결을 닫습니다.
-     *
-     * @param connection
-     *         닫을 Connection 객체
-     */
-    public static void close (Connection connection) {
-        if (connection != null) {
-            try {
-                connection.close ();
-            } catch (SQLException e) {
-                e.printStackTrace ();
-            }
-        }
-    }
 }

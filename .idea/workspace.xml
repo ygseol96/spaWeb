@@ -9,7 +9,13 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="011d9629-fcb6-4719-ac05-459c688f6b85" name="Changes" comment="SPA 프로젝트 설정 업데이트" />
+    <list default="true" id="011d9629-fcb6-4719-ac05-459c688f6b85" name="Changes" comment="SPA 프로젝트 설정 업데이트">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/servlet/WeekendWorkServlet.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/servlet/WeekendWorkServlet.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/util/DBConnection.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/util/DBConnection.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/webapp/login.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/webapp/login.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/webapp/main.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/webapp/main.html" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -73,46 +79,46 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;ASKED_SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
-    &quot;Database Script.schema.sql.executor&quot;: &quot;Run&quot;,
-    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
-    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
-    &quot;Tomcat Server.Tomcat 10.1.50.executor&quot;: &quot;Run&quot;,
-    &quot;Tomcat Server.Unnamed.executor&quot;: &quot;Run&quot;,
-    &quot;dev.sweep.assistant.data.RecentlyUsedFiles&quot;: &quot;src\\main\\java\\com\\example\\filter\\SessionCheckFilter.java;src\\main\\webapp\\api\\work.jsp;src\\main\\webapp\\WEB-INF\\lib\\jakarta.servlet-api-6.0.0.jar!\\jakarta\\servlet\\http\\HttpServletResponse.class;src\\main\\webapp\\api\\login.jsp;src\\main\\webapp\\WEB-INF\\response-messages.json;src\\main\\webapp\\WEB-INF\\lib\\catalina.jar!\\org\\apache\\catalina\\loader\\WebappClassLoaderBase.class;src\\main\\java\\com\\example\\servlet\\WorkServlet.java;src\\main\\webapp\\main.html;src\\main\\java\\com\\example\\util\\DBConnection.java;src\\main\\webapp\\artifacts\\web\\main.html&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
-    &quot;ignore.preview.features.used&quot;: &quot;true&quot;,
-    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/Users/ygseo/workspace/spaWeb/src/main/webapp/WEB-INF&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;project.structure.last.edited&quot;: &quot;Project&quot;,
-    &quot;project.structure.proportion&quot;: &quot;0.15429688&quot;,
-    &quot;project.structure.side.proportion&quot;: &quot;0.2&quot;,
-    &quot;run.code.analysis.last.selected.profile&quot;: &quot;pProject Default&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;File.Encoding&quot;,
-    &quot;sweep.chatMode&quot;: &quot;Agent&quot;,
-    &quot;sweep.selectedModel&quot;: &quot;Auto&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ASKED_SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "Database Script.schema.sql.executor": "Run",
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
+    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "Tomcat Server.Tomcat 10.1.50.executor": "Run",
+    "Tomcat Server.Unnamed.executor": "Run",
+    "dev.sweep.assistant.data.RecentlyUsedFiles": "src\\main\\java\\com\\example\\filter\\SessionCheckFilter.java;src\\main\\webapp\\api\\work.jsp;src\\main\\webapp\\WEB-INF\\lib\\jakarta.servlet-api-6.0.0.jar!\\jakarta\\servlet\\http\\HttpServletResponse.class;src\\main\\webapp\\api\\login.jsp;src\\main\\webapp\\WEB-INF\\response-messages.json;src\\main\\webapp\\WEB-INF\\lib\\catalina.jar!\\org\\apache\\catalina\\loader\\WebappClassLoaderBase.class;src\\main\\java\\com\\example\\servlet\\WorkServlet.java;src\\main\\webapp\\main.html;src\\main\\java\\com\\example\\util\\DBConnection.java;src\\main\\webapp\\artifacts\\web\\main.html",
+    "git-widget-placeholder": "master",
+    "ignore.preview.features.used": "true",
+    "kotlin-language-version-configured": "true",
+    "last_opened_file_path": "C:/Users/ygseo/workspace/spaWeb/src/main/webapp/WEB-INF",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "project.structure.last.edited": "Project",
+    "project.structure.proportion": "0.15429688",
+    "project.structure.side.proportion": "0.2",
+    "run.code.analysis.last.selected.profile": "pProject Default",
+    "settings.editor.selected.configurable": "preferences.rainbow.brackets.stop.list",
+    "sweep.chatMode": "Agent",
+    "sweep.selectedModel": "Auto",
+    "vue.rearranger.settings.migration": "true"
   },
-  &quot;keyToStringList&quot;: {
-    &quot;DatabaseDriversLRU&quot;: [
-      &quot;mysql&quot;
+  "keyToStringList": {
+    "DatabaseDriversLRU": [
+      "mysql"
     ],
-    &quot;RunConfigurationTargetLRU&quot;: [
-      &quot;433587ff-11a1-4ef0-9701-01ae3311e40c&quot;
+    "RunConfigurationTargetLRU": [
+      "433587ff-11a1-4ef0-9701-01ae3311e40c"
     ]
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="C:\Users\ygseo\workspace\spaWeb\src\main\webapp\WEB-INF" />
@@ -296,36 +302,5 @@
   <component name="VcsManagerConfiguration">
     <MESSAGE value="SPA 프로젝트 설정 업데이트" />
     <option name="LAST_COMMIT_MESSAGE" value="SPA 프로젝트 설정 업데이트" />
-  </component>
-  <component name="XDebuggerManager">
-    <breakpoint-manager>
-      <breakpoints>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/main/java/com/example/servlet/WeekendWorkServlet.java</url>
-          <line>95</line>
-          <option name="timeStamp" value="26" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/main/java/com/example/servlet/WeekendWorkServlet.java</url>
-          <line>96</line>
-          <option name="timeStamp" value="29" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/main/java/com/example/servlet/WeekendWorkServlet.java</url>
-          <line>204</line>
-          <option name="timeStamp" value="40" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/main/java/com/example/servlet/WeekendWorkServlet.java</url>
-          <line>201</line>
-          <option name="timeStamp" value="42" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/main/java/com/example/servlet/WeekendWorkServlet.java</url>
-          <line>197</line>
-          <option name="timeStamp" value="43" />
-        </line-breakpoint>
-      </breakpoints>
-    </breakpoint-manager>
   </component>
 </project>
