@@ -1,0 +1,2787 @@
+Index: src/main/java/com/example/servlet/WeekendWorkServlet.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.example.servlet;\r\n\r\nimport com.example.util.DBConnection;\r\n\r\nimport com.google.gson.Gson;\r\nimport com.google.gson.JsonObject;\r\nimport jakarta.servlet.ServletException;\r\nimport jakarta.servlet.annotation.WebServlet;\r\nimport jakarta.servlet.http.HttpServlet;\r\nimport jakarta.servlet.http.HttpServletRequest;\r\nimport jakarta.servlet.http.HttpServletResponse;\r\n\r\nimport java.io.IOException;\r\nimport java.io.PrintWriter;\r\nimport java.sql.*;\r\nimport java.util.ArrayList;\r\nimport java.util.HashMap;\r\nimport java.util.List;\r\nimport java.util.Map;\r\n\r\n/**\r\n * 주말근무 서블릿 - SPA 형태로 직접 DB 처리\r\n */\r\n@WebServlet(urlPatterns = {\"/api/*\", \"/work/*\"})\r\npublic class WeekendWorkServlet extends HttpServlet {\r\n\r\n    private final Gson gson = new Gson();\r\n\r\n    /**\r\n     * GET 요청 처리 - 주말근무 목록 조회 (페이징)\r\n     *\r\n     * @param request  the request\r\n     * @param response the response\r\n     * @throws ServletException the servlet exception\r\n     * @throws IOException      the io exception\r\n     */\r\n    @Override\r\n    protected void doGet(HttpServletRequest request, HttpServletResponse response)\r\n            throws ServletException, IOException {\r\n\r\n        // 한글 인코딩 설정\r\n        request.setCharacterEncoding(\"UTF-8\");\r\n        response.setContentType(\"application/json; charset=UTF-8\");\r\n\r\n        PrintWriter out = response.getWriter();\r\n\r\n        try {\r\n            // 페이징 파라미터 가져오기\r\n            String pageParam = request.getParameter(\"page\");\r\n            String sizeParam = request.getParameter(\"size\");\r\n\r\n            int page = (pageParam != null) ? Integer.parseInt(pageParam) : 1;\r\n            int size = (sizeParam != null) ? Integer.parseInt(sizeParam) : 10;\r\n\r\n            // 유효성 검증\r\n            if (page < 1) page = 1;\r\n            if (size < 1 || size > 100) size = 10;\r\n\r\n            // 데이터 조회\r\n            List<Map<String, Object>> list = getWeekendWorkList(page, size);\r\n            int totalCount = getTotalCount();\r\n            int totalPages = (int) Math.ceil((double) totalCount / size);\r\n\r\n            // 응답 데이터 구성\r\n            Map<String, Object> responseData = new HashMap<>();\r\n            responseData.put(\"success\", true);\r\n            responseData.put(\"data\", list);\r\n\r\n            Map<String, Object> pagination = new HashMap<>();\r\n            pagination.put(\"currentPage\", page);\r\n            pagination.put(\"pageSize\", size);\r\n            pagination.put(\"totalCount\", totalCount);\r\n            pagination.put(\"totalPages\", totalPages);\r\n            responseData.put(\"pagination\", pagination);\r\n\r\n            response.setStatus(HttpServletResponse.SC_OK);\r\n            out.print(gson.toJson(responseData));\r\n\r\n        } catch (NumberFormatException e) {\r\n            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);\r\n            JsonObject error = new JsonObject();\r\n            error.addProperty(\"success\", false);\r\n            error.addProperty(\"message\", \"잘못된 페이지 파라미터입니다.\");\r\n            out.print(gson.toJson(error));\r\n        } catch (Exception e) {\r\n            e.printStackTrace();\r\n            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);\r\n            JsonObject error = new JsonObject();\r\n            error.addProperty(\"success\", false);\r\n            error.addProperty(\"message\", \"서버 오류가 발생했습니다: \" + e.getMessage());\r\n            out.print(gson.toJson(error));\r\n        }\r\n    }\r\n\r\n\r\n\r\n    protected void doPost(HttpServletRequest request, HttpServletResponse response)\r\n            throws ServletException, IOException {\r\n\r\n        // 한글 인코딩 설정\r\n        request.setCharacterEncoding(\"UTF-8\");\r\n        response.setContentType(\"application/json; charset=UTF-8\");\r\n\r\n        PrintWriter out = response.getWriter();\r\n\r\n        try {\r\n            // 페이징 파라미터 가져오기\r\n            String pageParam = request.getParameter(\"page\");\r\n            String sizeParam = request.getParameter(\"size\");\r\n\r\n            int page = (pageParam != null) ? Integer.parseInt(pageParam) : 1;\r\n            int size = (sizeParam != null) ? Integer.parseInt(sizeParam) : 10;\r\n\r\n            // 유효성 검증\r\n            if (page < 1) page = 1;\r\n            if (size < 1 || size > 100) size = 10;\r\n\r\n            // 데이터 조회\r\n            List<Map<String, Object>> list = getWeekendWorkList(page, size);\r\n            int totalCount = getTotalCount();\r\n            int totalPages = (int) Math.ceil((double) totalCount / size);\r\n\r\n            // 응답 데이터 구성\r\n            Map<String, Object> responseData = new HashMap<>();\r\n            responseData.put(\"success\", true);\r\n            responseData.put(\"data\", list);\r\n\r\n            Map<String, Object> pagination = new HashMap<>();\r\n            pagination.put(\"currentPage\", page);\r\n            pagination.put(\"pageSize\", size);\r\n            pagination.put(\"totalCount\", totalCount);\r\n            pagination.put(\"totalPages\", totalPages);\r\n            responseData.put(\"pagination\", pagination);\r\n\r\n            response.setStatus(HttpServletResponse.SC_OK);\r\n            out.print(gson.toJson(responseData));\r\n\r\n        } catch (NumberFormatException e) {\r\n            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);\r\n            JsonObject error = new JsonObject();\r\n            error.addProperty(\"success\", false);\r\n            error.addProperty(\"message\", \"잘못된 페이지 파라미터입니다.\");\r\n            out.print(gson.toJson(error));\r\n        } catch (Exception e) {\r\n            e.printStackTrace();\r\n            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);\r\n            JsonObject error = new JsonObject();\r\n            error.addProperty(\"success\", false);\r\n            error.addProperty(\"message\", \"서버 오류가 발생했습니다: \" + e.getMessage());\r\n            out.print(gson.toJson(error));\r\n        }\r\n    }\r\n    /**\r\n     * 전체 레코드 수를 조회합니다.\r\n     *\r\n     * @return 전체 레코드 수\r\n     */\r\n    private int getTotalCount() {\r\n        String sql = \"SELECT COUNT(*) FROM tbl_weekend_work\";\r\n        try (Connection conn = DBConnection.getConnection();\r\n             PreparedStatement pstmt = conn.prepareStatement(sql);\r\n             ResultSet rs = pstmt.executeQuery()) {\r\n\r\n            if (rs.next()) {\r\n                return rs.getInt(1);\r\n            }\r\n        } catch (SQLException e) {\r\n            e.printStackTrace();\r\n        }\r\n        return 0;\r\n    }\r\n\r\n    /**\r\n     * 페이징 처리된 주말근무 목록을 조회합니다.\r\n     *\r\n     * @param page 페이지 번호 (1부터 시작)\r\n     * @param size 페이지당 레코드 수\r\n     * @return 주말근무 목록\r\n     */\r\n    private List<Map<String, Object>> getWeekendWorkList(int page, int size) {\r\n        List<Map<String, Object>> list = new ArrayList<>();\r\n        int offset = (page - 1) * size;\r\n\r\n        String sql = \"SELECT * FROM tbl_weekend_work ORDER BY work_idx DESC, user_id DESC LIMIT ? OFFSET ?\";\r\n\r\n        try (Connection conn = DBConnection.getConnection();\r\n             PreparedStatement pstmt = conn.prepareStatement(sql)) {\r\n\r\n            pstmt.setInt(1, size);\r\n            pstmt.setInt(2, offset);\r\n\r\n            try (ResultSet rs = pstmt.executeQuery()) {\r\n                while (rs.next()) {\r\n                    Map<String, Object> work = new HashMap<>();\r\n                    work.put(\"id\", rs.getLong(\"user_id\"));\r\n                    work.put(\"employeeName\", rs.getString(\"user_name\"));\r\n                    work.put(\"department\", rs.getString(\"user_dept\"));\r\n                    work.put(\"workDate\", rs.getDate(\"work_date\").toString());\r\n                    work.put(\"startTime\", rs.getTime(\"start_at\").toString());\r\n                    work.put(\"endTime\", rs.getTime(\"end_at\").toString());\r\n                    work.put(\"workHours\", rs.getDouble(\"created_at\"));\r\n                    work.put(\"workType\", rs.getString(\"work_flag\"));\r\n                    work.put(\"reason\", rs.getString(\"etc_comment\"));\r\n                    work.put(\"status\", rs.getString(\"confirm_yn\"));\r\n                    list.add(work);\r\n                }\r\n            }\r\n        } catch (SQLException e) {\r\n            e.printStackTrace();\r\n        }\r\n\r\n        return list;\r\n    }\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/com/example/servlet/WeekendWorkServlet.java b/src/main/java/com/example/servlet/WeekendWorkServlet.java
+--- a/src/main/java/com/example/servlet/WeekendWorkServlet.java	(revision 056c021e94183c9940018bd298bd14f91e5eeda3)
++++ b/src/main/java/com/example/servlet/WeekendWorkServlet.java	(date 1769270087365)
+@@ -1,7 +1,6 @@
+ package com.example.servlet;
+ 
+ import com.example.util.DBConnection;
+-
+ import com.google.gson.Gson;
+ import com.google.gson.JsonObject;
+ import jakarta.servlet.ServletException;
+@@ -12,7 +11,10 @@
+ 
+ import java.io.IOException;
+ import java.io.PrintWriter;
+-import java.sql.*;
++import java.sql.Connection;
++import java.sql.PreparedStatement;
++import java.sql.ResultSet;
++import java.sql.SQLException;
+ import java.util.ArrayList;
+ import java.util.HashMap;
+ import java.util.List;
+@@ -21,151 +23,133 @@
+ /**
+  * 주말근무 서블릿 - SPA 형태로 직접 DB 처리
+  */
+-@WebServlet(urlPatterns = {"/api/*", "/work/*"})
++@WebServlet("/weekend-work")
+ public class WeekendWorkServlet extends HttpServlet {
+ 
+-    private final Gson gson = new Gson();
++    private final Gson gson = new Gson ();
+ 
+     /**
+      * GET 요청 처리 - 주말근무 목록 조회 (페이징)
+      *
+-     * @param request  the request
+-     * @param response the response
+-     * @throws ServletException the servlet exception
+-     * @throws IOException      the io exception
++     * @param request
++     *         the request
++     * @param response
++     *         the response
++     *
++     * @throws ServletException
++     *         the servlet exception
++     * @throws IOException
++     *         the io exception
+      */
+     @Override
+-    protected void doGet(HttpServletRequest request, HttpServletResponse response)
++    protected void doGet (HttpServletRequest request, HttpServletResponse response)
+             throws ServletException, IOException {
+ 
+-        // 한글 인코딩 설정
+-        request.setCharacterEncoding("UTF-8");
+-        response.setContentType("application/json; charset=UTF-8");
+-
+-        PrintWriter out = response.getWriter();
+-
+-        try {
+-            // 페이징 파라미터 가져오기
+-            String pageParam = request.getParameter("page");
+-            String sizeParam = request.getParameter("size");
+-
+-            int page = (pageParam != null) ? Integer.parseInt(pageParam) : 1;
+-            int size = (sizeParam != null) ? Integer.parseInt(sizeParam) : 10;
+-
+-            // 유효성 검증
+-            if (page < 1) page = 1;
+-            if (size < 1 || size > 100) size = 10;
+-
+-            // 데이터 조회
+-            List<Map<String, Object>> list = getWeekendWorkList(page, size);
+-            int totalCount = getTotalCount();
+-            int totalPages = (int) Math.ceil((double) totalCount / size);
+-
+-            // 응답 데이터 구성
+-            Map<String, Object> responseData = new HashMap<>();
+-            responseData.put("success", true);
+-            responseData.put("data", list);
+-
+-            Map<String, Object> pagination = new HashMap<>();
+-            pagination.put("currentPage", page);
+-            pagination.put("pageSize", size);
+-            pagination.put("totalCount", totalCount);
+-            pagination.put("totalPages", totalPages);
+-            responseData.put("pagination", pagination);
+-
+-            response.setStatus(HttpServletResponse.SC_OK);
+-            out.print(gson.toJson(responseData));
+-
+-        } catch (NumberFormatException e) {
+-            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+-            JsonObject error = new JsonObject();
+-            error.addProperty("success", false);
+-            error.addProperty("message", "잘못된 페이지 파라미터입니다.");
+-            out.print(gson.toJson(error));
+-        } catch (Exception e) {
+-            e.printStackTrace();
+-            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+-            JsonObject error = new JsonObject();
+-            error.addProperty("success", false);
+-            error.addProperty("message", "서버 오류가 발생했습니다: " + e.getMessage());
+-            out.print(gson.toJson(error));
+-        }
++        handleRequest (request, response);
+     }
+ 
+-
+-
+-    protected void doPost(HttpServletRequest request, HttpServletResponse response)
++    /**
++     * POST 요청 처리 - 주말근무 목록 조회 (페이징)
++     *
++     * @param request
++     *         the request
++     * @param response
++     *         the response
++     *
++     * @throws ServletException
++     *         the servlet exception
++     * @throws IOException
++     *         the io exception
++     */
++    @Override
++    protected void doPost (HttpServletRequest request, HttpServletResponse response)
+             throws ServletException, IOException {
++        handleRequest (request, response);
++
++    }
+ 
+-        // 한글 인코딩 설정
+-        request.setCharacterEncoding("UTF-8");
+-        response.setContentType("application/json; charset=UTF-8");
++    /**
++     * GET/POST 요청 공통 처리 로직
++     *
++     * @param request
++     *         the request
++     * @param response
++     *         the response
++     *
++     * @throws ServletException
++     *         the servlet exception
++     * @throws IOException
++     *         the io exception
++     */
++    private void handleRequest (HttpServletRequest request, HttpServletResponse response)
++            throws ServletException, IOException {
+ 
+-        PrintWriter out = response.getWriter();
++        // 요청 파라미터 가져오기
++        String pageParam = request.getParameter ("page");
++        String sizeParam = request.getParameter ("size");
++
++        PrintWriter out = getWriter();
+ 
+         try {
+             // 페이징 파라미터 가져오기
+-            String pageParam = request.getParameter("page");
+-            String sizeParam = request.getParameter("size");
+-
+-            int page = (pageParam != null) ? Integer.parseInt(pageParam) : 1;
+-            int size = (sizeParam != null) ? Integer.parseInt(sizeParam) : 10;
++            int page = (pageParam != null) ? Integer.parseInt (pageParam) : 1;
++            int size = (sizeParam != null) ? Integer.parseInt (sizeParam) : 10;
+ 
+             // 유효성 검증
+             if (page < 1) page = 1;
+-            if (size < 1 || size > 100) size = 10;
++            if (size < 1 || size > 100) size = 5;
+ 
+             // 데이터 조회
+             List<Map<String, Object>> list = getWeekendWorkList(page, size);
+-            int totalCount = getTotalCount();
+-            int totalPages = (int) Math.ceil((double) totalCount / size);
++            int totalCount = getTotalCount ();
++            int totalPages = (int) Math.ceil ((double) totalCount / size);
+ 
+             // 응답 데이터 구성
+-            Map<String, Object> responseData = new HashMap<>();
+-            responseData.put("success", true);
+-            responseData.put("data", list);
++            Map<String, Object> responseData = new HashMap<> ();
++            responseData.put ("success", true);
++            responseData.put ("data", list);
+ 
+-            Map<String, Object> pagination = new HashMap<>();
+-            pagination.put("currentPage", page);
+-            pagination.put("pageSize", size);
+-            pagination.put("totalCount", totalCount);
+-            pagination.put("totalPages", totalPages);
+-            responseData.put("pagination", pagination);
+-
+-            response.setStatus(HttpServletResponse.SC_OK);
+-            out.print(gson.toJson(responseData));
+-
++            Map<String, Object> pagination = new HashMap<> ();
++            pagination.put ("currentPage", page);
++            pagination.put ("pageSize", size);
++            pagination.put ("totalCount", totalCount);
++            pagination.put ("totalPages", totalPages);
++            responseData.put ("pagination", pagination);
++            response.setContentType ("application/json; charset=UTF-8");
++            response.setStatus (HttpServletResponse.SC_OK);
++            out.print (gson.toJson (responseData));
+         } catch (NumberFormatException e) {
+-            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+-            JsonObject error = new JsonObject();
+-            error.addProperty("success", false);
+-            error.addProperty("message", "잘못된 페이지 파라미터입니다.");
+-            out.print(gson.toJson(error));
++            response.setStatus (HttpServletResponse.SC_BAD_REQUEST);
++            JsonObject error = new JsonObject ();
++            error.addProperty ("success", false);
++            error.addProperty ("message", "잘못된 페이지 파라미터입니다.");
++            out.print (gson.toJson (error));
+         } catch (Exception e) {
+-            e.printStackTrace();
+-            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+-            JsonObject error = new JsonObject();
+-            error.addProperty("success", false);
+-            error.addProperty("message", "서버 오류가 발생했습니다: " + e.getMessage());
+-            out.print(gson.toJson(error));
++            e.printStackTrace ();
++            response.setStatus (HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
++            JsonObject error = new JsonObject ();
++            error.addProperty ("success", false);
++            error.addProperty ("message", "서버 오류가 발생했습니다: " + e.getMessage ());
++            out.print (gson.toJson (error));
+         }
+     }
++
+     /**
+      * 전체 레코드 수를 조회합니다.
+      *
+      * @return 전체 레코드 수
+      */
+-    private int getTotalCount() {
++    private int getTotalCount () {
+         String sql = "SELECT COUNT(*) FROM tbl_weekend_work";
+-        try (Connection conn = DBConnection.getConnection();
+-             PreparedStatement pstmt = conn.prepareStatement(sql);
+-             ResultSet rs = pstmt.executeQuery()) {
++        try (Connection conn = DBConnection.getConnection ();
++             PreparedStatement pstmt = conn.prepareStatement (sql);
++             ResultSet rs = pstmt.executeQuery ()) {
+ 
+-            if (rs.next()) {
+-                return rs.getInt(1);
++            if (rs.next ()) {
++                return rs.getInt (1);
+             }
+         } catch (SQLException e) {
+-            e.printStackTrace();
++            e.printStackTrace ();
+         }
+         return 0;
+     }
+@@ -173,40 +157,43 @@
+     /**
+      * 페이징 처리된 주말근무 목록을 조회합니다.
+      *
+-     * @param page 페이지 번호 (1부터 시작)
+-     * @param size 페이지당 레코드 수
++     * @param page
++     *         페이지 번호 (1부터 시작)
++     * @param size
++     *         페이지당 레코드 수
++     *
+      * @return 주말근무 목록
+      */
+-    private List<Map<String, Object>> getWeekendWorkList(int page, int size) {
+-        List<Map<String, Object>> list = new ArrayList<>();
++    private List<Map<String, Object>> getWeekendWorkList (int page, int size) {
++        List<Map<String, Object>> list = new ArrayList<> ();
+         int offset = (page - 1) * size;
+ 
+-        String sql = "SELECT * FROM tbl_weekend_work ORDER BY work_idx DESC, user_id DESC LIMIT ? OFFSET ?";
++        String sql = "SELECT * FROM tbl_weekend_work ORDER BY idx DESC, user_id DESC LIMIT ? OFFSET ?";
+ 
+-        try (Connection conn = DBConnection.getConnection();
+-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
++        try (Connection conn = DBConnection.getConnection ();
++             PreparedStatement pstmt = conn.prepareStatement (sql)) {
+ 
+-            pstmt.setInt(1, size);
+-            pstmt.setInt(2, offset);
++            pstmt.setInt (1, size);
++            pstmt.setInt (2, offset);
+ 
+-            try (ResultSet rs = pstmt.executeQuery()) {
+-                while (rs.next()) {
+-                    Map<String, Object> work = new HashMap<>();
+-                    work.put("id", rs.getLong("user_id"));
+-                    work.put("employeeName", rs.getString("user_name"));
+-                    work.put("department", rs.getString("user_dept"));
+-                    work.put("workDate", rs.getDate("work_date").toString());
+-                    work.put("startTime", rs.getTime("start_at").toString());
+-                    work.put("endTime", rs.getTime("end_at").toString());
+-                    work.put("workHours", rs.getDouble("created_at"));
+-                    work.put("workType", rs.getString("work_flag"));
+-                    work.put("reason", rs.getString("etc_comment"));
+-                    work.put("status", rs.getString("confirm_yn"));
+-                    list.add(work);
++            try (ResultSet rs = pstmt.executeQuery ()) {
++                while (rs.next ()) {
++                    Map<String, Object> work = new HashMap<> ();
++                    work.put ("id", rs.getLong ("user_id"));
++                    work.put ("employeeName", rs.getString ("user_name"));
++                    work.put ("department", rs.getString ("user_dept"));
++                    work.put ("workDate", rs.getDate ("work_date").toString ());
++                    work.put ("startTime", rs.getTime ("start_at").toString ());
++                    work.put ("endTime", rs.getTime ("end_at").toString ());
++                    work.put ("workHours", rs.getDouble ("created_at"));
++                    work.put ("workType", rs.getString ("work_flag"));
++                    work.put ("reason", rs.getString ("etc_comment"));
++                    work.put ("status", rs.getString ("confirm_yn"));
++                    list.add (work);
+                 }
+             }
+         } catch (SQLException e) {
+-            e.printStackTrace();
++            e.printStackTrace ();
+         }
+ 
+         return list;
+Index: src/main/java/com/example/util/DBConnection.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.example.util;\r\n\r\nimport java.sql.Connection;\r\nimport java.sql.DriverManager;\r\nimport java.sql.SQLException;\r\n\r\n/**\r\n * 데이터베이스 연결 유틸리티 클래스\r\n */\r\npublic class DBConnection {\r\n\r\n    private static final String URL = \"jdbc:mysql://localhost:3307/skn?useSSL=false&characterEncoding=UTF-8\";\r\n    private static final String USER = \"root\";\r\n    private static final String PASSWORD = \"4563\";\r\n\r\n    static {\r\n        try {\r\n            // MySQL JDBC 드라이버 로드\r\n            Class.forName(\"com.mysql.cj.jdbc.Driver\");\r\n        } catch (ClassNotFoundException e) {\r\n            throw new RuntimeException(\"MySQL JDBC 드라이버를 찾을 수 없습니다.\", e);\r\n        }\r\n    }\r\n\r\n    /**\r\n     * 데이터베이스 연결을 반환합니다.\r\n     *\r\n     * @return Connection 객체\r\n     * @throws SQLException SQL 예외\r\n     */\r\n    public static Connection getConnection() throws SQLException {\r\n        return DriverManager.getConnection(URL, USER, PASSWORD);\r\n    }\r\n\r\n    /**\r\n     * 연결을 닫습니다.\r\n     *\r\n     * @param connection 닫을 Connection 객체\r\n     */\r\n    public static void close(Connection connection) {\r\n        if (connection != null) {\r\n            try {\r\n                connection.close();\r\n            } catch (SQLException e) {\r\n                e.printStackTrace();\r\n            }\r\n        }\r\n    }\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/com/example/util/DBConnection.java b/src/main/java/com/example/util/DBConnection.java
+--- a/src/main/java/com/example/util/DBConnection.java	(revision 056c021e94183c9940018bd298bd14f91e5eeda3)
++++ b/src/main/java/com/example/util/DBConnection.java	(date 1769270044118)
+@@ -9,16 +9,16 @@
+  */
+ public class DBConnection {
+ 
+-    private static final String URL = "jdbc:mysql://localhost:3307/skn?useSSL=false&characterEncoding=UTF-8";
++    private static final String URL = "JDBC:mysql://localhost:3307/skn?characterEncoding=UTF-8";
+     private static final String USER = "root";
+     private static final String PASSWORD = "4563";
+ 
+     static {
+         try {
+             // MySQL JDBC 드라이버 로드
+-            Class.forName("com.mysql.cj.jdbc.Driver");
++            Class.forName ("com.mysql.cj.jdbc.Driver");
+         } catch (ClassNotFoundException e) {
+-            throw new RuntimeException("MySQL JDBC 드라이버를 찾을 수 없습니다.", e);
++            throw new RuntimeException ("MySQL JDBC 드라이버를 찾을 수 없습니다.", e);
+         }
+     }
+ 
+@@ -26,23 +26,26 @@
+      * 데이터베이스 연결을 반환합니다.
+      *
+      * @return Connection 객체
+-     * @throws SQLException SQL 예외
++     *
++     * @throws SQLException
++     *         SQL 예외
+      */
+-    public static Connection getConnection() throws SQLException {
+-        return DriverManager.getConnection(URL, USER, PASSWORD);
++    public static Connection getConnection () throws SQLException {
++        return DriverManager.getConnection (URL, USER, PASSWORD);
+     }
+ 
+     /**
+      * 연결을 닫습니다.
+      *
+-     * @param connection 닫을 Connection 객체
++     * @param connection
++     *         닫을 Connection 객체
+      */
+-    public static void close(Connection connection) {
++    public static void close (Connection connection) {
+         if (connection != null) {
+             try {
+-                connection.close();
++                connection.close ();
+             } catch (SQLException e) {
+-                e.printStackTrace();
++                e.printStackTrace ();
+             }
+         }
+     }
+Index: src/main/webapp/WEB-INF/web.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n<web-app xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\r\n         xmlns=\"https://jakarta.ee/xml/ns/jakartaee\"\r\n         xsi:schemaLocation=\"https://jakarta.ee/xml/ns/jakartaee\r\n         https://jakarta.ee/xml/ns/jakartaee/web-app_6_0.xsd\"\r\n         version=\"6.0\">\r\n\r\n    <display-name>SPA Web Application</display-name>\r\n    <description>SPA with Hash Routing and Servlet Session Management</description>\r\n\r\n    <!-- 웰컴 파일 설정 -->\r\n    <welcome-file-list>\r\n        <welcome-file>login.html</welcome-file>\r\n        <welcome-file>main.html</welcome-file>\r\n    </welcome-file-list>\r\n\r\n\r\n\r\n    <!-- 에러 페이지 설정 -->\r\n    <error-page>\r\n        <error-code>404</error-code>\r\n        <location>/login.html</location>\r\n    </error-page>\r\n\r\n    <error-page>\r\n        <error-code>500</error-code>\r\n        <location>/login.html</location>\r\n    </error-page>\r\n\r\n</web-app>\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/webapp/WEB-INF/web.xml b/src/main/webapp/WEB-INF/web.xml
+--- a/src/main/webapp/WEB-INF/web.xml	(revision 056c021e94183c9940018bd298bd14f91e5eeda3)
++++ b/src/main/webapp/WEB-INF/web.xml	(date 1769268284813)
+@@ -1,30 +1,9 @@
+ <?xml version="1.0" encoding="UTF-8"?>
+-<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+-         xmlns="https://jakarta.ee/xml/ns/jakartaee"
+-         xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee
+-         https://jakarta.ee/xml/ns/jakartaee/web-app_6_0.xsd"
+-         version="6.0">
+-
+-    <display-name>SPA Web Application</display-name>
+-    <description>SPA with Hash Routing and Servlet Session Management</description>
+-
+-    <!-- 웰컴 파일 설정 -->
+-    <welcome-file-list>
+-        <welcome-file>login.html</welcome-file>
+-        <welcome-file>main.html</welcome-file>
+-    </welcome-file-list>
+-
+-
+-
+-    <!-- 에러 페이지 설정 -->
+-    <error-page>
+-        <error-code>404</error-code>
+-        <location>/login.html</location>
+-    </error-page>
+-
+-    <error-page>
+-        <error-code>500</error-code>
+-        <location>/login.html</location>
+-    </error-page>
+-
+-</web-app>
++<web-app xmlns="http://xmlns.jcp.org/xml/ns/javaee"
++         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
++         xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_4_0.xsd"
++         version="4.0">
++   <welcome-file-list>
++      <welcome-file>/index.html</welcome-file>
++   </welcome-file-list>
++</web-app>
+\ No newline at end of file
+Index: src/main/webapp/main.html
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>\r\n<head>\r\n    <meta charset=\"UTF-8\">\r\n    <meta content=\"width=device-width, initial-scale=1.0\" name=\"viewport\">\r\n    <title>SPA Main</title>\r\n    <!-- jQuery 라이브러리 -->\r\n    <style>\r\n        * {\r\n            margin: 0;\r\n            padding: 0;\r\n            box-sizing: border-box;\r\n        }\r\n\r\n        body {\r\n            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;\r\n            background-color: #f5f5f5;\r\n        }\r\n\r\n        /* 헤더 스타일 */\r\n        .header {\r\n            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);\r\n            color: white;\r\n            padding: 0 20px;\r\n            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);\r\n            position: sticky;\r\n            top: 0;\r\n            z-index: 1000;\r\n        }\r\n\r\n        .header-content {\r\n            max-width: 1200px;\r\n            margin: 0 auto;\r\n            display: flex;\r\n            justify-content: space-between;\r\n            align-items: center;\r\n            height: 60px;\r\n        }\r\n\r\n        .logo {\r\n            font-size: 24px;\r\n            font-weight: bold;\r\n        }\r\n\r\n        .user-info {\r\n            display: flex;\r\n            align-items: center;\r\n            gap: 15px;\r\n        }\r\n\r\n        .username {\r\n            font-size: 14px;\r\n        }\r\n\r\n        .logout-btn {\r\n            padding: 8px 16px;\r\n            background: rgba(255, 255, 255, 0.2);\r\n            border: 1px solid rgba(255, 255, 255, 0.3);\r\n            color: white;\r\n            border-radius: 5px;\r\n            cursor: pointer;\r\n            font-size: 14px;\r\n            transition: background 0.3s;\r\n        }\r\n\r\n        .logout-btn:hover {\r\n            background: rgba(255, 255, 255, 0.3);\r\n        }\r\n\r\n        /* GNB 스타일 */\r\n        .gnb {\r\n            background: white;\r\n            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);\r\n        }\r\n\r\n        .gnb-content {\r\n            max-width: 1200px;\r\n            margin: 0 auto;\r\n            display: flex;\r\n            gap: 0;\r\n        }\r\n\r\n        .gnb-item {\r\n            flex: 1;\r\n            text-align: center;\r\n            padding: 18px 20px;\r\n            cursor: pointer;\r\n            color: #666;\r\n            font-weight: 500;\r\n            text-decoration: none;\r\n            display: block;\r\n            transition: all 0.3s;\r\n            border-bottom: 3px solid transparent;\r\n        }\r\n\r\n        .gnb-item:hover {\r\n            color: #667eea;\r\n            background-color: #f8f9ff;\r\n        }\r\n\r\n        .gnb-item.active {\r\n            color: #667eea;\r\n            border-bottom-color: #667eea;\r\n            background-color: #f8f9ff;\r\n        }\r\n\r\n        /* 컨텐츠 영역 */\r\n        .container {\r\n            max-width: 1200px;\r\n            margin: 30px auto;\r\n            padding: 0 20px;\r\n        }\r\n\r\n        .content-area {\r\n            background: white;\r\n            border-radius: 10px;\r\n            padding: 30px;\r\n            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);\r\n            min-height: 500px;\r\n        }\r\n\r\n        .page-title {\r\n            font-size: 28px;\r\n            color: #333;\r\n            margin-bottom: 20px;\r\n            padding-bottom: 15px;\r\n            border-bottom: 2px solid #f0f0f0;\r\n        }\r\n\r\n        .page-content {\r\n            color: #666;\r\n            line-height: 1.8;\r\n        }\r\n\r\n        /* 카드 스타일 */\r\n        .card-grid {\r\n            display: grid;\r\n            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));\r\n            gap: 20px;\r\n            margin-top: 20px;\r\n        }\r\n\r\n        .card {\r\n            background: #f8f9ff;\r\n            padding: 20px;\r\n            border-radius: 8px;\r\n            border-left: 4px solid #667eea;\r\n            transition: transform 0.2s, box-shadow 0.2s;\r\n        }\r\n\r\n        .card:hover {\r\n            transform: translateY(-5px);\r\n            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.2);\r\n        }\r\n\r\n        .card-title {\r\n            font-size: 18px;\r\n            font-weight: 600;\r\n            color: #333;\r\n            margin-bottom: 10px;\r\n        }\r\n\r\n        .card-description {\r\n            font-size: 14px;\r\n            color: #666;\r\n        }\r\n\r\n        /* 테이블 스타일 */\r\n        .data-table {\r\n            width: 100%;\r\n            border-collapse: collapse;\r\n            margin-top: 20px;\r\n        }\r\n\r\n        .data-table th,\r\n        .data-table td {\r\n            padding: 12px;\r\n            text-align: left;\r\n            border-bottom: 1px solid #f0f0f0;\r\n        }\r\n\r\n        .data-table th {\r\n            background-color: #f8f9ff;\r\n            color: #667eea;\r\n            font-weight: 600;\r\n        }\r\n\r\n        .data-table tr:hover {\r\n            background-color: #fafafa;\r\n        }\r\n\r\n        /* 통계 카드 */\r\n        .stats-grid {\r\n            display: grid;\r\n            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));\r\n            gap: 20px;\r\n            margin-top: 20px;\r\n        }\r\n\r\n        .stat-card {\r\n            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);\r\n            color: white;\r\n            padding: 25px;\r\n            border-radius: 10px;\r\n            text-align: center;\r\n        }\r\n\r\n        .stat-value {\r\n            font-size: 36px;\r\n            font-weight: bold;\r\n            margin-bottom: 5px;\r\n        }\r\n\r\n        .stat-label {\r\n            font-size: 14px;\r\n            opacity: 0.9;\r\n        }\r\n\r\n        /* 주말근무 그리드 스타일 */\r\n        .weekend-work-grid {\r\n            margin-top: 20px;\r\n        }\r\n\r\n        .grid-controls {\r\n            display: flex;\r\n            justify-content: space-between;\r\n            align-items: center;\r\n            margin-bottom: 15px;\r\n        }\r\n\r\n        .grid-info {\r\n            color: #666;\r\n            font-size: 14px;\r\n        }\r\n\r\n        .grid-table {\r\n            width: 100%;\r\n            border-collapse: collapse;\r\n            background: white;\r\n            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);\r\n            border-radius: 8px;\r\n            overflow: hidden;\r\n        }\r\n\r\n        .grid-table thead {\r\n            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);\r\n            color: white;\r\n        }\r\n\r\n        .grid-table th {\r\n            padding: 15px 12px;\r\n            text-align: left;\r\n            font-weight: 600;\r\n            font-size: 14px;\r\n        }\r\n\r\n        .grid-table td {\r\n            padding: 12px;\r\n            border-bottom: 1px solid #f0f0f0;\r\n            font-size: 14px;\r\n            color: #333;\r\n        }\r\n\r\n        .grid-table tbody tr:hover {\r\n            background-color: #f8f9ff;\r\n        }\r\n\r\n        .grid-table tbody tr:last-child td {\r\n            border-bottom: none;\r\n        }\r\n\r\n        .status-badge {\r\n            display: inline-block;\r\n            padding: 4px 12px;\r\n            border-radius: 12px;\r\n            font-size: 12px;\r\n            font-weight: 600;\r\n        }\r\n\r\n        .status-approved {\r\n            background-color: #d4edda;\r\n            color: #155724;\r\n        }\r\n\r\n        .status-pending {\r\n            background-color: #fff3cd;\r\n            color: #856404;\r\n        }\r\n\r\n        .status-rejected {\r\n            background-color: #f8d7da;\r\n            color: #721c24;\r\n        }\r\n\r\n        /* 페이징 스타일 */\r\n        .pagination {\r\n            display: flex;\r\n            justify-content: center;\r\n            align-items: center;\r\n            gap: 5px;\r\n            margin-top: 20px;\r\n        }\r\n\r\n        .pagination button {\r\n            padding: 8px 12px;\r\n            border: 1px solid #ddd;\r\n            background: white;\r\n            color: #333;\r\n            border-radius: 5px;\r\n            cursor: pointer;\r\n            font-size: 14px;\r\n            transition: all 0.3s;\r\n        }\r\n\r\n        .pagination button:hover:not(:disabled) {\r\n            background: #667eea;\r\n            color: white;\r\n            border-color: #667eea;\r\n        }\r\n\r\n        .pagination button:disabled {\r\n            opacity: 0.5;\r\n            cursor: not-allowed;\r\n        }\r\n\r\n        .pagination button.active {\r\n            background: #667eea;\r\n            color: white;\r\n            border-color: #667eea;\r\n        }\r\n\r\n        .pagination .page-info {\r\n            padding: 8px 12px;\r\n            color: #666;\r\n            font-size: 14px;\r\n        }\r\n    </style>\r\n</head>\r\n<body>\r\n<!-- 헤더 -->\r\n<header class=\"header\">\r\n    <div class=\"header-content\">\r\n        <div class=\"logo\">일용직 주말 근태관리 시스템</div>\r\n        <div class=\"user-info\">\r\n            <span class=\"username\" id=\"userDisplay\">사용자</span>\r\n            <button class=\"logout-btn\" id=\"logoutBtn\">로그아웃</button>\r\n        </div>\r\n    </div>\r\n</header>\r\n\r\n<!-- GNB (Global Navigation Bar) -->\r\n<nav class=\"gnb\">\r\n    <div class=\"gnb-content\">\r\n        <a class=\"gnb-item active\" data-page=\"api/work\" href=\"#api/work\">홈</a>\r\n        <a class=\"gnb-item\" data-page=\"dashboard\" href=\"#dashboard\">대시보드</a>\r\n        <a class=\"gnb-item\" data-page=\"data\" href=\"#data\">데이터 관리</a>\r\n        <a class=\"gnb-item\" data-page=\"settings\" href=\"#settings\">설정</a>\r\n    </div>\r\n</nav>\r\n\r\n<!-- 컨텐츠 영역 -->\r\n<div class=\"container\">\r\n    <div class=\"content-area\" id=\"contentArea\">\r\n        <!-- 동적으로 로드될 컨텐츠 -->\r\n    </div>\r\n</div>\r\n\r\n<script>\r\n    // 로그아웃 기능\r\n    document.getElementById('logoutBtn').addEventListener('click', function () {\r\n        if (confirm('로그아웃 하시겠습니까?')) {\r\n            // 서블릿으로 로그아웃 요청\r\n            fetch('logout', {\r\n                method: 'POST'\r\n            })\r\n                .then(() => {\r\n                    window.location.href = 'login.html';\r\n                })\r\n                .catch(error => {\r\n                    console.error('로그아웃 오류:', error);\r\n                    // 오류가 발생해도 로그인 페이지로 이동\r\n                    window.location.href = 'login.html';\r\n                });\r\n        }\r\n    });\r\n\r\n    // 페이지 컨텐츠 정의\r\n    const pages = {\r\n        home: {\r\n            title: '주말근무 관리',\r\n            content: `\r\n                    <div class=\"page-content\">\r\n                        <div id=\"weekendWorkGrid\">\r\n                            <div style=\"text-align: center; padding: 40px; color: #999;\">\r\n                                데이터를 불러오는 중...\r\n                            </div>\r\n                        </div>\r\n                    </div>\r\n                `,\r\n            onLoad: loadWeekendWorkData\r\n        },\r\n        dashboard: {\r\n            title: '대시보드',\r\n            content: `\r\n                    <div class=\"page-content\">\r\n                        <p>실시간 데이터와 통계를 확인할 수 있습니다.</p>\r\n                        <div class=\"stats-grid\">\r\n                            <div class=\"stat-card\">\r\n                                <div class=\"stat-value\">95%</div>\r\n                                <div class=\"stat-label\">시스템 가동률</div>\r\n                            </div>\r\n                            <div class=\"stat-card\">\r\n                                <div class=\"stat-value\">2.5s</div>\r\n                                <div class=\"stat-label\">평균 응답시간</div>\r\n                            </div>\r\n                            <div class=\"stat-card\">\r\n                                <div class=\"stat-value\">156</div>\r\n                                <div class=\"stat-label\">처리된 요청</div>\r\n                            </div>\r\n                            <div class=\"stat-card\">\r\n                                <div class=\"stat-value\">99.9%</div>\r\n                                <div class=\"stat-label\">성공률</div>\r\n                            </div>\r\n                        </div>\r\n                        <table class=\"data-table\">\r\n                            <thead>\r\n                                <tr>\r\n                                    <th>시간</th>\r\n                                    <th>이벤트</th>\r\n                                    <th>상태</th>\r\n                                    <th>사용자</th>\r\n                                </tr>\r\n                            </thead>\r\n                            <tbody>\r\n                                <tr>\r\n                                    <td>10:30:25</td>\r\n                                    <td>데이터 업데이트</td>\r\n                                    <td>성공</td>\r\n                                    <td>admin</td>\r\n                                </tr>\r\n                                <tr>\r\n                                    <td>10:28:15</td>\r\n                                    <td>사용자 로그인</td>\r\n                                    <td>성공</td>\r\n                                    <td>user01</td>\r\n                                </tr>\r\n                                <tr>\r\n                                    <td>10:25:42</td>\r\n                                    <td>시스템 백업</td>\r\n                                    <td>완료</td>\r\n                                    <td>system</td>\r\n                                </tr>\r\n                                <tr>\r\n                                    <td>10:20:18</td>\r\n                                    <td>보고서 생성</td>\r\n                                    <td>성공</td>\r\n                                    <td>admin</td>\r\n                                </tr>\r\n                            </tbody>\r\n                        </table>\r\n                    </div>\r\n                `,\r\n        },\r\n        data: {\r\n            title: '데이터 관리',\r\n            content: `\r\n                    <div class=\"page-content\">\r\n                        <p>데이터를 조회하고 관리할 수 있습니다.</p>\r\n                        <table class=\"data-table\">\r\n                            <thead>\r\n                                <tr>\r\n                                    <th>ID</th>\r\n                                    <th>제목</th>\r\n                                    <th>작성자</th>\r\n                                    <th>작성일</th>\r\n                                    <th>상태</th>\r\n                                </tr>\r\n                            </thead>\r\n                            <tbody>\r\n                                <tr>\r\n                                    <td>001</td>\r\n                                    <td>프로젝트 기획서</td>\r\n                                    <td>홍길동</td>\r\n                                    <td>2024-01-15</td>\r\n                                    <td>완료</td>\r\n                                </tr>\r\n                                <tr>\r\n                                    <td>002</td>\r\n                                    <td>시스템 설계 문서</td>\r\n                                    <td>김철수</td>\r\n                                    <td>2024-01-14</td>\r\n                                    <td>진행중</td>\r\n                                </tr>\r\n                                <tr>\r\n                                    <td>003</td>\r\n                                    <td>테스트 계획서</td>\r\n                                    <td>이영희</td>\r\n                                    <td>2024-01-13</td>\r\n                                    <td>대기</td>\r\n                                </tr>\r\n                                <tr>\r\n                                    <td>004</td>\r\n                                    <td>사용자 매뉴얼</td>\r\n                                    <td>박민수</td>\r\n                                    <td>2024-01-12</td>\r\n                                    <td>완료</td>\r\n                                </tr>\r\n                                <tr>\r\n                                    <td>005</td>\r\n                                    <td>API 문서</td>\r\n                                    <td>정수진</td>\r\n                                    <td>2024-01-11</td>\r\n                                    <td>진행중</td>\r\n                                </tr>\r\n                            </tbody>\r\n                        </table>\r\n                    </div>\r\n                `\r\n        },\r\n        settings: {\r\n            title: '설정',\r\n            content: `\r\n                    <div class=\"page-content\">\r\n                        <p>시스템 설정을 관리할 수 있습니다.</p>\r\n                        <div class=\"card-grid\">\r\n                            <div class=\"card\">\r\n                                <div class=\"card-title\">계정 설정</div>\r\n                                <div class=\"card-description\">사용자 정보와 비밀번호를 변경할 수 있습니다.</div>\r\n                            </div>\r\n                            <div class=\"card\">\r\n                                <div class=\"card-title\">알림 설정</div>\r\n                                <div class=\"card-description\">알림 수신 방법과 빈도를 설정할 수 있습니다.</div>\r\n                            </div>\r\n                            <div class=\"card\">\r\n                                <div class=\"card-title\">보안 설정</div>\r\n                                <div class=\"card-description\">2단계 인증 및 보안 옵션을 관리합니다.</div>\r\n                            </div>\r\n                            <div class=\"card\">\r\n                                <div class=\"card-title\">시스템 설정</div>\r\n                                <div class=\"card-description\">언어, 테마 등 시스템 환경을 설정합니다.</div>\r\n                            </div>\r\n                            <div class=\"card\">\r\n                                <div class=\"card-title\">권한 관리</div>\r\n                                <div class=\"card-description\">사용자 역할과 권한을 관리합니다.</div>\r\n                            </div>\r\n                            <div class=\"card\">\r\n                                <div class=\"card-title\">백업 설정</div>\r\n                                <div class=\"card-description\">자동 백업 주기와 저장 위치를 설정합니다.</div>\r\n                            </div>\r\n                        </div>\r\n                    </div>\r\n                `\r\n        }\r\n    };\r\n\r\n    // 주말근무 데이터 로드 함수\r\n    let currentPage = 1;\r\n    const pageSize = 10;\r\n\r\n    function loadWeekendWorkData(page = 1) {\r\n        currentPage = page;\r\n\r\n        // GET 요청의 쿼리 파라미터를 URL에 추가\r\n        const url = `api/work.jsp`;\r\n\r\n        fetch('api/work.jsp', {\r\n            method: 'POST',\r\n            headers: {\r\n                'Content-Type': 'application/x-www-form-urlencoded',\r\n            },\r\n            body: new URLSearchParams({\r\n                'page': currentPage,\r\n                'pageSize': pageSize\r\n            })\r\n        })\r\n            .then(response => response.json())\r\n            .then(data => {\r\n                if (data.success) {\r\n                    renderWeekendWorkGrid(data.data, data.pagination);\r\n                } else {\r\n                    showError('데이터를 불러오는데 실패했습니다.');\r\n                }\r\n            })\r\n            .catch(error => {\r\n                console.error('Error:', error);\r\n                showError('서버 오류가 발생했습니다.');\r\n            });\r\n    }\r\n\r\n    function renderWeekendWorkGrid(dataList, pagination) {\r\n        const gridContainer = document.getElementById('weekendWorkGrid');\r\n\r\n        if (!dataList || dataList.length === 0) {\r\n            gridContainer.innerHTML = `\r\n                <div style=\"text-align: center; padding: 40px; color: #999;\">\r\n                    등록된 주말근무 데이터가 없습니다.\r\n                </div>\r\n            `;\r\n            return;\r\n        }\r\n\r\n        let html = `\r\n            <div class=\"weekend-work-grid\">\r\n                <div class=\"grid-controls\">\r\n                    <div class=\"grid-info\">\r\n                        전체 ${pagination.totalCount}건 (${pagination.currentPage} / ${pagination.totalPages} 페이지)\r\n                    </div>\r\n                </div>\r\n                <table class=\"grid-table\">\r\n                    <thead>\r\n                        <tr>\r\n                            <th>번호</th>\r\n                            <th>직원명</th>\r\n                            <th>부서</th>\r\n                            <th>근무일자</th>\r\n                            <th>시작시간</th>\r\n                            <th>종료시간</th>\r\n                            <th>근무시간</th>\r\n                            <th>근무유형</th>\r\n                            <th>근무사유</th>\r\n                            <th>상태</th>\r\n                        </tr>\r\n                    </thead>\r\n                    <tbody>\r\n        `;\r\n\r\n        dataList.forEach(item => {\r\n            const statusClass = item.status === 'APPROVED' ? 'status-approved' :\r\n                              item.status === 'PENDING' ? 'status-pending' : 'status-rejected';\r\n            const statusText = item.status === 'APPROVED' ? '승인' :\r\n                             item.status === 'PENDING' ? '대기' : '반려';\r\n\r\n            html += `\r\n                <tr>\r\n                    <td>${item.id}</td>\r\n                    <td>${item.employeeName}</td>\r\n                    <td>${item.department}</td>\r\n                    <td>${item.workDate}</td>\r\n                    <td>${item.startTime}</td>\r\n                    <td>${item.endTime}</td>\r\n                    <td>${item.workHours}시간</td>\r\n                    <td>${item.workType}</td>\r\n                    <td>${item.reason || '-'}</td>\r\n                    <td><span class=\"status-badge ${statusClass}\">${statusText}</span></td>\r\n                </tr>\r\n            `;\r\n        });\r\n\r\n        html += `\r\n                    </tbody>\r\n                </table>\r\n                ${renderPagination(pagination)}\r\n            </div>\r\n        `;\r\n\r\n        gridContainer.innerHTML = html;\r\n    }\r\n\r\n    function renderPagination(pagination) {\r\n        const { currentPage, totalPages } = pagination;\r\n        let html = '<div class=\"pagination\">';\r\n\r\n        // 이전 버튼\r\n        html += `<button onclick=\"loadWeekendWorkData(${currentPage - 1})\" ${currentPage === 1 ? 'disabled' : ''}>이전</button>`;\r\n\r\n        // 페이지 번호\r\n        const startPage = Math.max(1, currentPage - 2);\r\n        const endPage = Math.min(totalPages, currentPage + 2);\r\n\r\n        if (startPage > 1) {\r\n            html += `<button onclick=\"loadWeekendWorkData(1)\">1</button>`;\r\n            if (startPage > 2) {\r\n                html += `<span class=\"page-info\">...</span>`;\r\n            }\r\n        }\r\n\r\n        for (let i = startPage; i <= endPage; i++) {\r\n            html += `<button onclick=\"loadWeekendWorkData(${i})\" class=\"${i === currentPage ? 'active' : ''}\">${i}</button>`;\r\n        }\r\n\r\n        if (endPage < totalPages) {\r\n            if (endPage < totalPages - 1) {\r\n                html += `<span class=\"page-info\">...</span>`;\r\n            }\r\n            html += `<button onclick=\"loadWeekendWorkData(${totalPages})\">${totalPages}</button>`;\r\n        }\r\n\r\n        // 다음 버튼\r\n        html += `<button onclick=\"loadWeekendWorkData(${currentPage + 1})\" ${currentPage === totalPages ? 'disabled' : ''}>다음</button>`;\r\n\r\n        html += '</div>';\r\n        return html;\r\n    }\r\n\r\n    function showError(message) {\r\n        const gridContainer = document.getElementById('weekendWorkGrid');\r\n        gridContainer.innerHTML = `\r\n            <div style=\"text-align: center; padding: 40px; color: #e74c3c;\">\r\n                ${message}\r\n            </div>\r\n        `;\r\n    }\r\n\r\n    // 해시 라우터 함수\r\n    function loadPage(pageName) {\r\n        const page = pages[pageName] || pages.home;\r\n        const contentArea = document.getElementById('contentArea');\r\n\r\n        contentArea.innerHTML = `\r\n                <h1 class=\"page-title\">${page.title}</h1>\r\n                ${page.content}`;\r\n\r\n        // GNB 활성화 상태 업데이트\r\n        document.querySelectorAll('.gnb-item').forEach(item => {\r\n            item.classList.remove('active');\r\n            if (item.dataset.page === pageName) {\r\n                item.classList.add('active');\r\n            }\r\n        });\r\n\r\n        // 페이지별 onLoad 함수 실행\r\n        if (page.onLoad && typeof page.onLoad === 'function') {\r\n            page.onLoad();\r\n        }\r\n    }\r\n\r\n    // 해시 변경 이벤트 리스너\r\n    window.addEventListener('hashchange', function () {\r\n        const hash = window.location.hash.substring(1) || 'home';\r\n        loadPage(hash);\r\n    });\r\n\r\n    // GNB 클릭 이벤트\r\n    document.querySelectorAll('.gnb-item').forEach(item => {\r\n        item.addEventListener('click', function (e) {\r\n            e.preventDefault();\r\n            const pageName = this.dataset.page;\r\n            window.location.hash = pageName;\r\n        });\r\n    });\r\n\r\n    // 초기 페이지 로드\r\n    const initialHash = window.location.hash.substring(1) || 'home';\r\n    loadPage(initialHash);\r\n</script>\r\n</body>\r\n</html>\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/webapp/main.html b/src/main/webapp/main.html
+--- a/src/main/webapp/main.html	(revision 056c021e94183c9940018bd298bd14f91e5eeda3)
++++ b/src/main/webapp/main.html	(date 1769269388578)
+@@ -560,17 +560,10 @@
+         currentPage = page;
+ 
+         // GET 요청의 쿼리 파라미터를 URL에 추가
+-        const url = `api/work.jsp`;
+ 
+-        fetch('api/work.jsp', {
+-            method: 'POST',
+-            headers: {
+-                'Content-Type': 'application/x-www-form-urlencoded',
+-            },
+-            body: new URLSearchParams({
+-                'page': currentPage,
+-                'pageSize': pageSize
+-            })
++        fetch('/weekend-work', {
++            method: 'GET',
++
+         })
+             .then(response => response.json())
+             .then(data => {
+Index: src/main/java/com/example/servlet/LogoutServlet.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.example.servlet;\r\n\r\nimport jakarta.servlet.ServletException;\r\nimport jakarta.servlet.annotation.WebServlet;\r\nimport jakarta.servlet.http.HttpServlet;\r\nimport jakarta.servlet.http.HttpServletRequest;\r\nimport jakarta.servlet.http.HttpServletResponse;\r\nimport jakarta.servlet.http.HttpSession;\r\n\r\nimport java.io.IOException;\r\nimport java.io.PrintWriter;\r\n\r\n/**\r\n * The type Logout servlet.\r\n */\r\n@WebServlet (\"/logout\")\r\npublic class LogoutServlet extends HttpServlet {\r\n\r\n    /**\r\n     * Do post.\r\n     *\r\n     * @param request  the request\r\n     * @param response the response\r\n     *\r\n     * @throws ServletException the servlet exception\r\n     * @throws IOException      the io exception\r\n     */\r\n    @Override\r\n    protected void doPost (HttpServletRequest request, HttpServletResponse response)\r\n            throws ServletException, IOException {\r\n        handleLogout (request, response);\r\n    }\r\n\r\n    /**\r\n     * Do get.\r\n     *\r\n     * @param request  the request\r\n     * @param response the response\r\n     *\r\n     * @throws ServletException the servlet exception\r\n     * @throws IOException      the io exception\r\n     */\r\n    @Override\r\n    protected void doGet (HttpServletRequest request, HttpServletResponse response)\r\n            throws ServletException, IOException {\r\n        handleLogout (request, response);\r\n    }\r\n\r\n    /**\r\n     * 로그아웃 처리 메서드\r\n     */\r\n    private void handleLogout (HttpServletRequest request, HttpServletResponse response)\r\n            throws IOException {\r\n\r\n        // 세션 가져오기 (없으면 null 반환)\r\n        HttpSession session = request.getSession (false);\r\n\r\n        if (session != null) {\r\n            // 세션 무효화\r\n            session.invalidate ();\r\n        }\r\n\r\n        // Accept 헤더 확인하여 JSON 또는 리다이렉트 응답\r\n        String acceptHeader = request.getHeader (\"Accept\");\r\n\r\n        if (acceptHeader != null && acceptHeader.contains (\"application/json\")) {\r\n            // JSON 응답\r\n            response.setContentType (\"application/json; charset=UTF-8\");\r\n            response.setStatus (HttpServletResponse.SC_OK);\r\n            PrintWriter out = response.getWriter ();\r\n            out.print (\"{\\\"success\\\": true, \\\"message\\\": \\\"로그아웃되었습니다.\\\"}\");\r\n        } else {\r\n            // 로그인 페이지로 리다이렉트\r\n            response.sendRedirect (request.getContextPath () + \"/login.html\");\r\n        }\r\n    }\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/com/example/servlet/LogoutServlet.java b/src/main/java/com/example/servlet/LogoutServlet.java
+--- a/src/main/java/com/example/servlet/LogoutServlet.java	(revision 056c021e94183c9940018bd298bd14f91e5eeda3)
++++ b/src/main/java/com/example/servlet/LogoutServlet.java	(date 1769178564645)
+@@ -19,11 +19,15 @@
+     /**
+      * Do post.
+      *
+-     * @param request  the request
+-     * @param response the response
++     * @param request
++     *         the request
++     * @param response
++     *         the response
+      *
+-     * @throws ServletException the servlet exception
+-     * @throws IOException      the io exception
++     * @throws ServletException
++     *         the servlet exception
++     * @throws IOException
++     *         the io exception
+      */
+     @Override
+     protected void doPost (HttpServletRequest request, HttpServletResponse response)
+@@ -34,11 +38,15 @@
+     /**
+      * Do get.
+      *
+-     * @param request  the request
+-     * @param response the response
++     * @param request
++     *         the request
++     * @param response
++     *         the response
+      *
+-     * @throws ServletException the servlet exception
+-     * @throws IOException      the io exception
++     * @throws ServletException
++     *         the servlet exception
++     * @throws IOException
++     *         the io exception
+      */
+     @Override
+     protected void doGet (HttpServletRequest request, HttpServletResponse response)
+Index: src/main/java/com/example/servlet/LoginServlet.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.example.servlet;\r\n\r\nimport jakarta.servlet.ServletException;\r\nimport jakarta.servlet.annotation.WebServlet;\r\nimport jakarta.servlet.http.HttpServlet;\r\nimport jakarta.servlet.http.HttpServletRequest;\r\nimport jakarta.servlet.http.HttpServletResponse;\r\nimport jakarta.servlet.http.HttpSession;\r\n\r\nimport java.io.IOException;\r\nimport java.io.PrintWriter;\r\n\r\n/**\r\n * The type Login servlet.\r\n */\r\n@WebServlet (\"/login\")\r\npublic class LoginServlet extends HttpServlet {\r\n\r\n    /**\r\n     * Do post.\r\n     *\r\n     * @param request  the request\r\n     * @param response the response\r\n     *\r\n     * @throws ServletException the servlet exception\r\n     * @throws IOException      the io exception\r\n     */\r\n    @Override\r\n    protected void doPost (HttpServletRequest request, HttpServletResponse response)\r\n            throws ServletException, IOException {\r\n\r\n        // 한글 인코딩 설정\r\n        request.setCharacterEncoding (\"UTF-8\");\r\n        response.setContentType (\"application/json; charset=UTF-8\");\r\n\r\n        // 요청 파라미터 가져오기\r\n        String username = request.getParameter (\"username\");\r\n        String password = request.getParameter (\"password\");\r\n\r\n        PrintWriter out = response.getWriter ();\r\n\r\n        // 입력값 검증\r\n        if (username == null || username.trim ().isEmpty () ||\r\n                password == null || password.trim ().isEmpty ()) {\r\n            response.setStatus (HttpServletResponse.SC_BAD_REQUEST);\r\n            out.print (\"{\\\"success\\\": false, \\\"message\\\": \\\"아이디와 비밀번호를 입력해주세요.\\\"}\");\r\n            return;\r\n        }\r\n\r\n        // 사용자 인증 (실제 환경에서는 데이터베이스 조회)\r\n        // 데모용: admin/admin123\r\n        if (authenticate (username, password)) {\r\n            // 세션 생성\r\n            HttpSession session = request.getSession (true);\r\n            session.setAttribute (\"isLoggedIn\", true);\r\n            session.setAttribute (\"username\", username);\r\n            session.setAttribute (\"loginTime\", System.currentTimeMillis ());\r\n\r\n            // 세션 타임아웃 설정 (30분)\r\n            session.setMaxInactiveInterval (30 * 60);\r\n\r\n            // 성공 응답\r\n            response.setStatus (HttpServletResponse.SC_OK);\r\n            out.print (\"{\\\"success\\\": true, \\\"message\\\": \\\"로그인 성공\\\", \\\"username\\\": \\\"\" + username + \"\\\"}\");\r\n        } else {\r\n            // 실패 응답\r\n            response.setStatus (HttpServletResponse.SC_UNAUTHORIZED);\r\n            out.print (\"{\\\"success\\\": false, \\\"message\\\": \\\"아이디 또는 비밀번호가 올바르지 않습니다.\\\"}\");\r\n        }\r\n    }\r\n\r\n    /**\r\n     * Do get.\r\n     *\r\n     * @param request  the request\r\n     * @param response the response\r\n     *\r\n     * @throws ServletException the servlet exception\r\n     * @throws IOException      the io exception\r\n     */\r\n    @Override\r\n    protected void doGet (HttpServletRequest request, HttpServletResponse response)\r\n            throws ServletException, IOException {\r\n        // GET 요청은 허용하지 않음\r\n        response.setStatus (HttpServletResponse.SC_METHOD_NOT_ALLOWED);\r\n        response.setContentType (\"application/json; charset=UTF-8\");\r\n        PrintWriter out = response.getWriter ();\r\n        out.print (\"{\\\"success\\\": false, \\\"message\\\": \\\"POST 메서드만 허용됩니다.\\\"}\");\r\n    }\r\n\r\n    /**\r\n     * 사용자 인증 메서드\r\n     * 실제 환경에서는 데이터베이스와 연동하여 사용자 정보를 확인해야 합니다.\r\n     *\r\n     * @param username\r\n     *         사용자 아이디\r\n     * @param password\r\n     *         비밀번호\r\n     *\r\n     * @return 인증 성공 여부\r\n     */\r\n    private boolean authenticate (String username, String password) {\r\n        // 데모용 하드코딩된 인증\r\n        // 실제 환경에서는 데이터베이스 조회 및 비밀번호 해시 비교\r\n        return \"admin\".equals (username) && \"admin123\".equals (password);\r\n    }\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/com/example/servlet/LoginServlet.java b/src/main/java/com/example/servlet/LoginServlet.java
+--- a/src/main/java/com/example/servlet/LoginServlet.java	(revision 056c021e94183c9940018bd298bd14f91e5eeda3)
++++ b/src/main/java/com/example/servlet/LoginServlet.java	(date 1769178564632)
+@@ -19,11 +19,15 @@
+     /**
+      * Do post.
+      *
+-     * @param request  the request
+-     * @param response the response
++     * @param request
++     *         the request
++     * @param response
++     *         the response
+      *
+-     * @throws ServletException the servlet exception
+-     * @throws IOException      the io exception
++     * @throws ServletException
++     *         the servlet exception
++     * @throws IOException
++     *         the io exception
+      */
+     @Override
+     protected void doPost (HttpServletRequest request, HttpServletResponse response)
+@@ -72,11 +76,15 @@
+     /**
+      * Do get.
+      *
+-     * @param request  the request
+-     * @param response the response
++     * @param request
++     *         the request
++     * @param response
++     *         the response
+      *
+-     * @throws ServletException the servlet exception
+-     * @throws IOException      the io exception
++     * @throws ServletException
++     *         the servlet exception
++     * @throws IOException
++     *         the io exception
+      */
+     @Override
+     protected void doGet (HttpServletRequest request, HttpServletResponse response)
+Index: src/main/webapp/META-INF/MANIFEST.MF
+===================================================================
+diff --git a/src/main/webapp/META-INF/MANIFEST.MF b/src/main/webapp/META-INF/MANIFEST.MF
+deleted file mode 100644
+--- a/src/main/webapp/META-INF/MANIFEST.MF	(revision 056c021e94183c9940018bd298bd14f91e5eeda3)
++++ /dev/null	(revision 056c021e94183c9940018bd298bd14f91e5eeda3)
+@@ -1,3 +0,0 @@
+-Manifest-Version: 1.0
+-Class-Path: 
+-
+Index: .idea/compiler.xml
+===================================================================
+diff --git a/.idea/compiler.xml b/.idea/compiler.xml
+deleted file mode 100644
+--- a/.idea/compiler.xml	(revision 056c021e94183c9940018bd298bd14f91e5eeda3)
++++ /dev/null	(revision 056c021e94183c9940018bd298bd14f91e5eeda3)
+@@ -1,9 +0,0 @@
+-<?xml version="1.0" encoding="UTF-8"?>
+-<project version="4">
+-  <component name="CompilerConfiguration">
+-    <bytecodeTargetLevel target="21" />
+-  </component>
+-  <component name="JavacSettings">
+-    <option name="GENERATE_NO_WARNINGS" value="true" />
+-  </component>
+-</project>
+\ No newline at end of file
+Index: src/main/java/com/example/filter/SessionCheckFilter.java
+===================================================================
+diff --git a/src/main/java/com/example/filter/SessionCheckFilter.java b/src/main/java/com/example/filter/SessionCheckFilter.java
+deleted file mode 100644
+--- a/src/main/java/com/example/filter/SessionCheckFilter.java	(revision 056c021e94183c9940018bd298bd14f91e5eeda3)
++++ /dev/null	(revision 056c021e94183c9940018bd298bd14f91e5eeda3)
+@@ -1,134 +0,0 @@
+-package com.example.filter;
+-
+-import jakarta.servlet.*;
+-import jakarta.servlet.annotation.WebFilter;
+-import jakarta.servlet.http.HttpServletRequest;
+-import jakarta.servlet.http.HttpServletResponse;
+-import jakarta.servlet.http.HttpSession;
+-
+-import java.io.IOException;
+-import java.util.Arrays;
+-import java.util.List;
+-
+-/**
+- * The type Session check filter.
+- */
+-@WebFilter (urlPatterns = {"/*", "/api/*"})
+-public class SessionCheckFilter implements Filter {
+-
+-    // 로그인 없이 접근 가능한 URL 패턴
+-    private static final List<String> EXCLUDE_URLS = Arrays.asList (
+-            "/login.html",
+-            "/login",
+-            "/index.html",
+-            "/work.jsp",
+-            "/work",
+-            "/logout",
+-            "/api/work.jsp",
+-            "/api/work",
+-            "/api/login.jsp",
+-            "/api/login"
+-    );
+-
+-    // 정적 리소스 확장자
+-    private static final List<String> STATIC_EXTENSIONS = Arrays.asList (
+-            ".css", ".js", ".jpg", ".jpeg", ".png", ".gif", ".ico", ".svg", ".woff", ".woff2", ".ttf"
+-    );
+-
+-    /**
+-     * Init.
+-     *
+-     * @param filterConfig the filter config
+-     *
+-     * @throws ServletException the servlet exception
+-     */
+-    @Override
+-    public void init (FilterConfig filterConfig) throws ServletException {
+-        // 필터 초기화 (필요시 설정 로드)
+-        System.out.println ("SessionCheckFilter initialized");
+-    }
+-
+-    /**
+-     * Do filter.
+-     *
+-     * @param request  the request
+-     * @param response the response
+-     * @param chain    the chain
+-     *
+-     * @throws IOException      the io exception
+-     * @throws ServletException the servlet exception
+-     */
+-    @Override
+-    public void doFilter (ServletRequest request, ServletResponse response, FilterChain chain)
+-            throws IOException, ServletException {
+-
+-        HttpServletRequest httpRequest = (HttpServletRequest) request;
+-        HttpServletResponse httpResponse = (HttpServletResponse) response;
+-
+-        String requestURI = httpRequest.getRequestURI ();
+-        String contextPath = httpRequest.getContextPath ();
+-        String path = requestURI.substring (contextPath.length ());
+-
+-        // 루트 경로 처리
+-        if (path.isEmpty () || path.equals ("/")) {
+-            path = "/index.html";
+-        }
+-
+-        // 제외 URL 체크
+-        if (isExcludedUrl (path)) {
+-            chain.doFilter (request, response);
+-            return;
+-        }
+-
+-        // 정적 리소스 체크
+-        if (isStaticResource (path)) {
+-            chain.doFilter (request, response);
+-            return;
+-        }
+-
+-        // 세션 체크
+-        HttpSession session = httpRequest.getSession (false);
+-        Boolean isLoggedIn = (session != null) ? (Boolean) session.getAttribute ("isLoggedIn") : null;
+-
+-        if (isLoggedIn != null && isLoggedIn) {
+-            // 로그인된 상태 - 요청 계속 진행
+-            chain.doFilter (request, response);
+-        } else {
+-            // 로그인되지 않은 상태
+-            // AJAX 요청인지 확인
+-            String requestedWith = httpRequest.getHeader ("X-Requested-With");
+-            String acceptHeader = httpRequest.getHeader ("Accept");
+-
+-            if ("XMLHttpRequest".equals (requestedWith) ||
+-                    (acceptHeader != null && acceptHeader.contains ("application/json"))) {
+-                // AJAX 요청인 경우 JSON 응답
+-                httpResponse.setStatus (HttpServletResponse.SC_UNAUTHORIZED);
+-                httpResponse.setContentType ("application/json; charset=UTF-8");
+-                httpResponse.getWriter ().write ("{\"success\": false, \"message\": \"로그인이 필요합니다.\", \"redirect\": \"/login.html\"}");
+-            }
+-        }
+-    }
+-
+-    /**
+-     * Destroy.
+-     */
+-    @Override
+-    public void destroy () {
+-        // 필터 종료 시 정리 작업
+-        System.out.println ("SessionCheckFilter destroyed");
+-    }
+-
+-    /**
+-     * 제외 URL 체크
+-     */
+-    private boolean isExcludedUrl (String path) {
+-        return EXCLUDE_URLS.stream ().anyMatch (path::startsWith);
+-    }
+-
+-    /**
+-     * 정적 리소스 체크
+-     */
+-    private boolean isStaticResource (String path) {
+-        return STATIC_EXTENSIONS.stream ().anyMatch (path::endsWith);
+-    }
+-}
+Index: .idea/inspectionProfiles/Project_Default.xml
+===================================================================
+diff --git a/.idea/inspectionProfiles/Project_Default.xml b/.idea/inspectionProfiles/Project_Default.xml
+deleted file mode 100644
+--- a/.idea/inspectionProfiles/Project_Default.xml	(revision 056c021e94183c9940018bd298bd14f91e5eeda3)
++++ /dev/null	(revision 056c021e94183c9940018bd298bd14f91e5eeda3)
+@@ -1,6 +0,0 @@
+-<component name="InspectionProjectProfileManager">
+-  <profile version="1.0">
+-    <option name="myName" value="Project Default" />
+-    <inspection_tool class="Eslint" enabled="true" level="WARNING" enabled_by_default="true" />
+-  </profile>
+-</component>
+\ No newline at end of file
+Index: spaWeb.iml
+===================================================================
+diff --git a/spaWeb.iml b/spaWeb.iml
+deleted file mode 100644
+--- a/spaWeb.iml	(revision 056c021e94183c9940018bd298bd14f91e5eeda3)
++++ /dev/null	(revision 056c021e94183c9940018bd298bd14f91e5eeda3)
+@@ -1,44 +0,0 @@
+-<?xml version="1.0" encoding="UTF-8"?>
+-<module type="JAVA_MODULE" version="4">
+-  <component name="FacetManager">
+-    <facet type="web" name="Web">
+-      <configuration>
+-        <descriptors>
+-          <deploymentDescriptor name="web.xml" url="file://$MODULE_DIR$/src/main/webapp/WEB-INF/web.xml" />
+-        </descriptors>
+-        <webroots>
+-          <root url="file://$MODULE_DIR$/src/main/webapp" relative="/" />
+-        </webroots>
+-      </configuration>
+-    </facet>
+-  </component>
+-  <component name="NewModuleRootManager" inherit-compiler-output="true">
+-    <exclude-output />
+-    <content url="file://$MODULE_DIR$">
+-      <sourceFolder url="file://$MODULE_DIR$/src/main/java" isTestSource="false" />
+-      <sourceFolder url="file://$MODULE_DIR$/src/main/resources" type="java-resource" />
+-      <excludeFolder url="file://$MODULE_DIR$/target" />
+-    </content>
+-    <orderEntry type="inheritedJdk" />
+-    <orderEntry type="sourceFolder" forTests="false" />
+-    <orderEntry type="module-library" scope="PROVIDED">
+-      <library>
+-        <CLASSES>
+-          <root url="jar://$MODULE_DIR$/lib/jakarta.servlet-api-6.0.0.jar!/" />
+-        </CLASSES>
+-        <JAVADOC />
+-        <SOURCES />
+-      </library>
+-    </orderEntry>
+-    <orderEntry type="module-library">
+-      <library>
+-        <CLASSES>
+-          <root url="jar://$MODULE_DIR$/lib/gson-2.10.1.jar!/" />
+-        </CLASSES>
+-        <JAVADOC />
+-        <SOURCES />
+-      </library>
+-    </orderEntry>
+-    <orderEntry type="library" name="lib" level="project" />
+-  </component>
+-</module>
+\ No newline at end of file
+Index: .idea/libraries/lib1.xml
+===================================================================
+diff --git a/.idea/libraries/lib1.xml b/.idea/libraries/lib1.xml
+deleted file mode 100644
+--- a/.idea/libraries/lib1.xml	(revision 056c021e94183c9940018bd298bd14f91e5eeda3)
++++ /dev/null	(revision 056c021e94183c9940018bd298bd14f91e5eeda3)
+@@ -1,13 +0,0 @@
+-<component name="libraryTable">
+-  <library name="lib1">
+-    <CLASSES>
+-      <root url="file://$PROJECT_DIR$/../../../../../tomcat 10.1.50-windows/apache-tomcat-10.1.50/lib" />
+-      <root url="jar://$PROJECT_DIR$/src/main/webapp/WEB-INF/lib/gson-2.10.1.jar!/" />
+-      <root url="jar://$PROJECT_DIR$/src/main/webapp/WEB-INF/lib/jakarta.servlet-api-6.0.0.jar!/" />
+-      <root url="jar://$PROJECT_DIR$/src/main/webapp/WEB-INF/lib/mysql-connector-j-8.4.0.jar!/" />
+-    </CLASSES>
+-    <JAVADOC />
+-    <SOURCES />
+-    <jarDirectory url="file://$PROJECT_DIR$/../../../../../tomcat 10.1.50-windows/apache-tomcat-10.1.50/lib" recursive="false" />
+-  </library>
+-</component>
+\ No newline at end of file
+Index: .idea/jsLinters/eslint.xml
+===================================================================
+diff --git a/.idea/jsLinters/eslint.xml b/.idea/jsLinters/eslint.xml
+deleted file mode 100644
+--- a/.idea/jsLinters/eslint.xml	(revision 056c021e94183c9940018bd298bd14f91e5eeda3)
++++ /dev/null	(revision 056c021e94183c9940018bd298bd14f91e5eeda3)
+@@ -1,6 +0,0 @@
+-<?xml version="1.0" encoding="UTF-8"?>
+-<project version="4">
+-  <component name="EslintConfiguration">
+-    <option name="fix-on-save" value="true" />
+-  </component>
+-</project>
+\ No newline at end of file
+Index: src/main/webapp/api/work.jsp
+===================================================================
+diff --git a/src/main/webapp/api/work.jsp b/src/main/webapp/api/work.jsp
+deleted file mode 100644
+--- a/src/main/webapp/api/work.jsp	(revision 056c021e94183c9940018bd298bd14f91e5eeda3)
++++ /dev/null	(revision 056c021e94183c9940018bd298bd14f91e5eeda3)
+@@ -1,10 +0,0 @@
+-<%@ page language="java" contentType="application/json; charset=UTF-8" pageEncoding="UTF-8"%>
+-<%@ page import="java.sql.*" %>
+-<%@ page import="com.google.gson.*" %>
+-<%@ page import="java.io.*" %>
+-<%@ page import="java.util.*" %>
+-<%
+-    // JSON 응답 설정
+-    response.setContentType("application/json");
+-    response.setCharacterEncoding("UTF-8");
+-%>
+Index: README.md
+===================================================================
+diff --git a/README.md b/README.md
+deleted file mode 100644
+--- a/README.md	(revision 056c021e94183c9940018bd298bd14f91e5eeda3)
++++ /dev/null	(revision 056c021e94183c9940018bd298bd14f91e5eeda3)
+@@ -1,187 +0,0 @@
+-# SPA 해시 라우팅 시스템
+-
+-## 프로젝트 개요
+-
+-이 프로젝트는 해시 라우팅을 사용하는 Single Page Application (SPA)입니다. 세션 기반 로그인 시스템과 4개의 GNB(Global Navigation Bar) 메뉴를 제공합니다.
+-
+-## 파일 구조
+-
+-```
+-spaWeb/
+-├── index.html      # 진입점 (세션 체크 후 리다이렉트)
+-├── login.html      # 로그인 페이지
+-├── main.html       # 메인 SPA 페이지 (해시 라우팅)
+-└── README.md       # 프로젝트 문서
+-```
+-
+-## 주요 기능
+-
+-### 1. 세션 기반 인증
+-
+-- **로그인 체크**: 세션이 없으면 자동으로 `login.html`로 리다이렉트
+-- **세션 유지**: 로그인 성공 시 sessionStorage에 사용자 정보 저장
+-- **로그아웃**: 세션 삭제 후 로그인 페이지로 이동
+-
+-### 2. 해시 라우팅 (Hash Routing)
+-
+-- URL 해시를 사용한 클라이언트 사이드 라우팅
+-- 페이지 새로고침 없이 컨텐츠 전환
+-- 브라우저 뒤로가기/앞으로가기 지원
+-
+-### 3. GNB (Global Navigation Bar)
+-
+-4개의 메뉴 항목:
+-
+-1. **홈** (`#home`) - 대시보드 통계 및 빠른 링크
+-2. **대시보드** (`#dashboard`) - 실시간 데이터 및 이벤트 로그
+-3. **데이터 관리** (`#data`) - 데이터 조회 및 관리
+-4. **설정** (`#settings`) - 시스템 설정 관리
+-
+-## 사용 방법
+-
+-### 1. 실행
+-
+-브라우저에서 `index.html` 파일을 열거나 웹 서버를 통해 접근합니다.
+-
+-```bash
+-# 간단한 HTTP 서버 실행 (Python 3)
+-python -m http.server 8000
+-
+-# 또는 Node.js http-server 사용
+-npx http-server
+-```
+-
+-브라우저에서 `http://localhost:8000` 접속
+-
+-### 2. 로그인
+-
+-- **아이디**: admin
+-- **비밀번호**: admin123
+-
+-### 3. 네비게이션
+-
+-- GNB 메뉴를 클릭하여 페이지 이동
+-- URL 해시를 직접 입력하여 접근 가능 (예: `main.html#dashboard`)
+-- 브라우저의 뒤로가기/앞으로가기 버튼 사용 가능
+-
+-## 기술 스택
+-
+-- **HTML5**: 마크업
+-- **CSS3**: 스타일링 (Flexbox, Grid, Gradient)
+-- **Vanilla JavaScript**: 로직 구현
+-- **SessionStorage**: 세션 관리
+-- **Hash Routing**: SPA 라우팅
+-
+-## 주요 코드 설명
+-
+-### 세션 체크 (login.html, main.html)
+-
+-```javascript
+-// 로그인 페이지: 이미 로그인되어 있으면 main.html로
+-if (sessionStorage.getItem('isLoggedIn') === 'true') {
+-    window.location.href = 'main.html';
+-}
+-
+-// 메인 페이지: 로그인되어 있지 않으면 login.html로
+-if (sessionStorage.getItem('isLoggedIn') !== 'true') {
+-    window.location.href = 'login.html';
+-}
+-```
+-
+-### 해시 라우팅 (main.html)
+-
+-```javascript
+-// 해시 변경 감지
+-window.addEventListener('hashchange', function() {
+-    const hash = window.location.hash.substring(1) || 'home';
+-    loadPage(hash);
+-});
+-
+-// 페이지 로드 함수
+-function loadPage(pageName) {
+-    const page = pages[pageName] || pages.home;
+-    contentArea.innerHTML = page.content;
+-    // GNB 활성화 상태 업데이트
+-}
+-```
+-
+-### 로그인 처리 (login.html)
+-
+-```javascript
+-// 로그인 성공 시
+-sessionStorage.setItem('isLoggedIn', 'true');
+-sessionStorage.setItem('username', username);
+-window.location.href = 'main.html';
+-```
+-
+-### 로그아웃 처리 (main.html)
+-
+-```javascript
+-// 로그아웃 버튼 클릭 시
+-sessionStorage.clear();
+-window.location.href = 'login.html';
+-```
+-
+-## 커스터마이징
+-
+-### 새로운 페이지 추가
+-
+-`main.html`의 `pages` 객체에 새로운 페이지를 추가:
+-
+-```javascript
+-const pages = {
+-    // 기존 페이지들...
+-    newpage: {
+-        title: '새 페이지',
+-        content: `
+-            <div class="page-content">
+-                <p>새로운 페이지 내용</p>
+-            </div>
+-        `
+-    }
+-};
+-```
+-
+-GNB에 메뉴 항목 추가:
+-
+-```html
+-<a href="#newpage" class="gnb-item" data-page="newpage">새 메뉴</a>
+-```
+-
+-### 로그인 인증 변경
+-
+-실제 서버 API를 사용하려면 `login.html`의 로그인 처리 부분을 수정:
+-
+-```javascript
+-// 서버 API 호출 예시
+-fetch('/api/login', {
+-    method: 'POST',
+-    headers: { 'Content-Type': 'application/json' },
+-    body: JSON.stringify({ username, password })
+-})
+-.then(response => response.json())
+-.then(data => {
+-    if (data.success) {
+-        sessionStorage.setItem('isLoggedIn', 'true');
+-        sessionStorage.setItem('username', data.username);
+-        window.location.href = 'main.html';
+-    }
+-});
+-```
+-
+-## 브라우저 호환성
+-
+-- Chrome (최신)
+-- Firefox (최신)
+-- Safari (최신)
+-- Edge (최신)
+-
+-## 라이선스
+-
+-MIT License
+-
+-## 참고사항
+-
+-- 이 프로젝트는 데모/학습 목적으로 제작되었습니다.
+-- 실제 프로덕션 환경에서는 서버 사이드 인증을 사용해야 합니다.
+-- sessionStorage는 브라우저를 닫으면 삭제됩니다.
+Index: .idea/prettier.xml
+===================================================================
+diff --git a/.idea/prettier.xml b/.idea/prettier.xml
+deleted file mode 100644
+--- a/.idea/prettier.xml	(revision 056c021e94183c9940018bd298bd14f91e5eeda3)
++++ /dev/null	(revision 056c021e94183c9940018bd298bd14f91e5eeda3)
+@@ -1,7 +0,0 @@
+-<?xml version="1.0" encoding="UTF-8"?>
+-<project version="4">
+-  <component name="PrettierConfiguration">
+-    <option name="myConfigurationMode" value="AUTOMATIC" />
+-    <option name="myRunOnSave" value="true" />
+-  </component>
+-</project>
+\ No newline at end of file
+Index: .idea/intellij-javadocs-4.0.1.xml
+===================================================================
+diff --git a/.idea/intellij-javadocs-4.0.1.xml b/.idea/intellij-javadocs-4.0.1.xml
+deleted file mode 100644
+--- a/.idea/intellij-javadocs-4.0.1.xml	(revision 056c021e94183c9940018bd298bd14f91e5eeda3)
++++ /dev/null	(revision 056c021e94183c9940018bd298bd14f91e5eeda3)
+@@ -1,204 +0,0 @@
+-<?xml version="1.0" encoding="UTF-8"?>
+-<project version="4">
+-  <component name="JavaDocConfiguration">
+-    <GENERAL>
+-      <MODE>REPLACE</MODE>
+-      <OVERRIDDEN_METHODS>false</OVERRIDDEN_METHODS>
+-      <SPLITTED_CLASS_NAME>true</SPLITTED_CLASS_NAME>
+-      <LEVELS>
+-        <LEVEL>TYPE</LEVEL>
+-        <LEVEL>METHOD</LEVEL>
+-        <LEVEL>FIELD</LEVEL>
+-      </LEVELS>
+-      <VISIBILITIES>
+-        <VISIBILITY>PUBLIC</VISIBILITY>
+-        <VISIBILITY>PROTECTED</VISIBILITY>
+-        <VISIBILITY>DEFAULT</VISIBILITY>
+-      </VISIBILITIES>
+-    </GENERAL>
+-    <TEMPLATES>
+-      <CLASSES>
+-        <CLASS>
+-          <KEY>^.*(public|protected|private)*.+interface\s+\w+.*</KEY>
+-          <VALUE>/**\n
+- * The interface ${name}.\n
+-&lt;#if element.typeParameters?has_content&gt;        * \n
+-&lt;/#if&gt;
+-&lt;#list element.typeParameters as typeParameter&gt;
+-        * @param &lt;${typeParameter.name}&gt; the type parameter\n
+-&lt;/#list&gt;
+- */</VALUE>
+-        </CLASS>
+-        <CLASS>
+-          <KEY>^.*(public|protected|private)*.+enum\s+\w+.*</KEY>
+-          <VALUE>/**\n
+- * The enum ${name}.\n
+- */</VALUE>
+-        </CLASS>
+-        <CLASS>
+-          <KEY>^.*(public|protected|private)*.+class\s+\w+.*</KEY>
+-          <VALUE>/**\n
+- * The type ${name}.\n
+-&lt;#if element.typeParameters?has_content&gt;        * \n
+-&lt;/#if&gt;
+-&lt;#list element.typeParameters as typeParameter&gt;
+-        * @param &lt;${typeParameter.name}&gt; the type parameter\n
+-&lt;/#list&gt;
+- */</VALUE>
+-        </CLASS>
+-        <CLASS>
+-          <KEY>.+</KEY>
+-          <VALUE>/**\n
+- * The type ${name}.\n
+- */</VALUE>
+-        </CLASS>
+-      </CLASSES>
+-      <CONSTRUCTORS>
+-        <CONSTRUCTOR>
+-          <KEY>.+</KEY>
+-          <VALUE>/**\n
+- * Instantiates a new ${name}.\n
+-&lt;#if element.parameterList.parameters?has_content&gt;
+-         *\n
+-&lt;/#if&gt;
+-&lt;#list element.parameterList.parameters as parameter&gt;
+-         * @param ${parameter.name} the ${paramNames[parameter.name]}\n
+-&lt;/#list&gt;
+-&lt;#if element.throwsList.referenceElements?has_content&gt;
+-         *\n
+-&lt;/#if&gt;
+-&lt;#list element.throwsList.referenceElements as exception&gt;
+-         * @throws ${exception.referenceName} the ${exceptionNames[exception.referenceName]}\n
+-&lt;/#list&gt;
+- */</VALUE>
+-        </CONSTRUCTOR>
+-      </CONSTRUCTORS>
+-      <METHODS>
+-        <METHOD>
+-          <KEY>^.*(public|protected|private)*\s*.*(\w(\s*&lt;.+&gt;)*)+\s+get\w+\s*\(.*\).+</KEY>
+-          <VALUE>/**\n
+- * Gets ${partName}.\n
+-&lt;#if element.typeParameters?has_content&gt;         * \n
+-&lt;/#if&gt;
+-&lt;#list element.typeParameters as typeParameter&gt;
+-         * @param &lt;${typeParameter.name}&gt; the type parameter\n
+-&lt;/#list&gt;
+-&lt;#if element.parameterList.parameters?has_content&gt;
+-         *\n
+-&lt;/#if&gt;
+-&lt;#list element.parameterList.parameters as parameter&gt;
+-         * @param ${parameter.name} the ${paramNames[parameter.name]}\n
+-&lt;/#list&gt;
+-&lt;#if isNotVoid&gt;
+-         *\n
+-         * @return the ${partName}\n
+-&lt;/#if&gt;
+-&lt;#if element.throwsList.referenceElements?has_content&gt;
+-         *\n
+-&lt;/#if&gt;
+-&lt;#list element.throwsList.referenceElements as exception&gt;
+-         * @throws ${exception.referenceName} the ${exceptionNames[exception.referenceName]}\n
+-&lt;/#list&gt;
+- */</VALUE>
+-        </METHOD>
+-        <METHOD>
+-          <KEY>^.*(public|protected|private)*\s*.*(void|\w(\s*&lt;.+&gt;)*)+\s+set\w+\s*\(.*\).+</KEY>
+-          <VALUE>/**\n
+- * Sets ${partName}.\n
+-&lt;#if element.typeParameters?has_content&gt;         * \n
+-&lt;/#if&gt;
+-&lt;#list element.typeParameters as typeParameter&gt;
+-         * @param &lt;${typeParameter.name}&gt; the type parameter\n
+-&lt;/#list&gt;
+-&lt;#if element.parameterList.parameters?has_content&gt;
+-         *\n
+-&lt;/#if&gt;
+-&lt;#list element.parameterList.parameters as parameter&gt;
+-         * @param ${parameter.name} the ${paramNames[parameter.name]}\n
+-&lt;/#list&gt;
+-&lt;#if isNotVoid&gt;
+-         *\n
+-         * @return the ${partName}\n
+-&lt;/#if&gt;
+-&lt;#if element.throwsList.referenceElements?has_content&gt;
+-         *\n
+-&lt;/#if&gt;
+-&lt;#list element.throwsList.referenceElements as exception&gt;
+-         * @throws ${exception.referenceName} the ${exceptionNames[exception.referenceName]}\n
+-&lt;/#list&gt;
+- */</VALUE>
+-        </METHOD>
+-        <METHOD>
+-          <KEY>^.*((public\s+static)|(static\s+public))\s+void\s+main\s*\(\s*String\s*(\[\s*\]|\.\.\.)\s+\w+\s*\).+</KEY>
+-          <VALUE>/**\n
+- * The entry point of application.\n
+-
+-     &lt;#if element.parameterList.parameters?has_content&gt;
+-         *\n
+-&lt;/#if&gt;
+-     * @param ${element.parameterList.parameters[0].name} the input arguments\n
+-&lt;#if element.throwsList.referenceElements?has_content&gt;
+-         *\n
+-&lt;/#if&gt;
+-&lt;#list element.throwsList.referenceElements as exception&gt;
+-         * @throws ${exception.referenceName} the ${exceptionNames[exception.referenceName]}\n
+-&lt;/#list&gt;
+- */</VALUE>
+-        </METHOD>
+-        <METHOD>
+-          <KEY>.+</KEY>
+-          <VALUE>/**\n
+- * ${name}&lt;#if isNotVoid&gt; ${return}&lt;/#if&gt;.\n
+-&lt;#if element.typeParameters?has_content&gt;         * \n
+-&lt;/#if&gt;
+-&lt;#list element.typeParameters as typeParameter&gt;
+-         * @param &lt;${typeParameter.name}&gt; the type parameter\n
+-&lt;/#list&gt;
+-&lt;#if element.parameterList.parameters?has_content&gt;
+-         *\n
+-&lt;/#if&gt;
+-&lt;#list element.parameterList.parameters as parameter&gt;
+-         * @param ${parameter.name} the ${paramNames[parameter.name]}\n
+-&lt;/#list&gt;
+-&lt;#if isNotVoid&gt;
+-         *\n
+-         * @return the ${return}\n
+-&lt;/#if&gt;
+-&lt;#if element.throwsList.referenceElements?has_content&gt;
+-         *\n
+-&lt;/#if&gt;
+-&lt;#list element.throwsList.referenceElements as exception&gt;
+-         * @throws ${exception.referenceName} the ${exceptionNames[exception.referenceName]}\n
+-&lt;/#list&gt;
+- */</VALUE>
+-        </METHOD>
+-      </METHODS>
+-      <FIELDS>
+-        <FIELD>
+-          <KEY>^.*(public|protected|private)*.+static.*(\w\s\w)+.+</KEY>
+-          <VALUE>/**\n
+- * The constant ${element.getName()}.\n
+- */</VALUE>
+-        </FIELD>
+-        <FIELD>
+-          <KEY>^.*(public|protected|private)*.*(\w\s\w)+.+</KEY>
+-          <VALUE>/**\n
+-    &lt;#if element.parent.isInterface()&gt;
+-        * The constant ${element.getName()}.\n
+-&lt;#else&gt;
+-        * The ${name}.\n
+-&lt;/#if&gt; */</VALUE>
+-        </FIELD>
+-        <FIELD>
+-          <KEY>.+</KEY>
+-          <VALUE>/**\n
+-    &lt;#if element.parent.isEnum()&gt;
+-        *${name} ${typeName}.\n
+-&lt;#else&gt;
+-        * The ${name}.\n
+-&lt;/#if&gt;*/</VALUE>
+-        </FIELD>
+-      </FIELDS>
+-    </TEMPLATES>
+-  </component>
+-</project>
+\ No newline at end of file
+Index: SETUP_GUIDE.md
+===================================================================
+diff --git a/SETUP_GUIDE.md b/SETUP_GUIDE.md
+deleted file mode 100644
+--- a/SETUP_GUIDE.md	(revision 056c021e94183c9940018bd298bd14f91e5eeda3)
++++ /dev/null	(revision 056c021e94183c9940018bd298bd14f91e5eeda3)
+@@ -1,148 +0,0 @@
+-# 빠른 시작 가이드
+-
+-## 1단계: 필수 라이브러리 다운로드
+-
+-### Jakarta Servlet API 다운로드 (필수)
+-
+-1. 브라우저에서 다음 링크 열기:
+-   ```
+-   https://repo1.maven.org/maven2/jakarta/servlet/jakarta.servlet-api/6.0.0/jakarta.servlet-api-6.0.0.jar
+-   ```
+-2. 다운로드한 파일을 `lib` 폴더에 저장
+-
+-### Gson 다운로드 (선택사항)
+-
+-1. 브라우저에서 다음 링크 열기:
+-   ```
+-   https://repo1.maven.org/maven2/com/google/code/gson/gson/2.10.1/gson-2.10.1.jar
+-   ```
+-2. 다운로드한 파일을 `lib` 폴더에 저장
+-
+-## 2단계: IntelliJ IDEA 설정
+-
+-### 방법 1: 자동 인식 (권장)
+-
+-1. IntelliJ IDEA에서 프로젝트 열기
+-2. 프로젝트가 자동으로 `.iml` 파일을 읽어 라이브러리 인식
+-3. 만약 인식되지 않으면 **File > Invalidate Caches / Restart** 실행
+-
+-### 방법 2: 수동 추가
+-
+-1. **File > Project Structure** (Ctrl+Alt+Shift+S)
+-2. **Modules > Dependencies** 탭 선택
+-3. **+ 버튼 > JARs or directories** 클릭
+-4. `lib/jakarta.servlet-api-6.0.0.jar` 선택
+-5. **Scope**를 **Provided**로 변경
+-6. 다시 **+ 버튼 > JARs or directories** 클릭
+-7. `lib/gson-2.10.1.jar` 선택 (Scope는 Compile 유지)
+-8. **Apply > OK**
+-
+-## 3단계: Tomcat 설정
+-
+-### Tomcat 다운로드 및 설치
+-
+-1. [Apache Tomcat 10](https://tomcat.apache.org/download-10.cgi) 다운로드
+-2. 압축 해제 (예: `C:/apache-tomcat-10.1.x`)
+-
+-### IntelliJ에서 Tomcat 설정
+-
+-1. **Run > Edit Configurations**
+-2. **+ > Tomcat Server > Local**
+-3. **Configure** 버튼 클릭하여 Tomcat 설치 경로 지정
+-4. **Deployment** 탭으로 이동
+-5. **+ > Artifact > spaWeb:war exploded** 선택
+-6. **Application context** 입력: `/spaWeb`
+-7. **Apply > OK**
+-
+-## 4단계: 프로젝트 실행
+-
+-1. **Run** 버튼 클릭 (Shift+F10)
+-2. Tomcat이 시작되고 브라우저가 자동으로 열림
+-3. 또는 수동으로 접속: `http://localhost:8080/spaWeb/`
+-
+-## 5단계: 로그인
+-
+-- **아이디**: `admin`
+-- **비밀번호**: `admin123`
+-
+-## 프로젝트 구조 확인
+-
+-```
+-spaWeb/
+-├── lib/                                    # JAR 파일 위치
+-│   ├── jakarta.servlet-api-6.0.0.jar      # 다운로드 필요
+-│   ├── gson-2.10.1.jar                    # 다운로드 필요 (선택)
+-│   └── README.txt
+-├── src/
+-│   └── main/
+-│       ├── java/
+-│       │   └── com/example/
+-│       │       ├── servlet/
+-│       │       │   ├── LoginServlet.java
+-│       │       │   └── LogoutServlet.java
+-│       │       └── filter/
+-│       │           └── SessionCheckFilter.java
+-│       └── webapp/
+-│           ├── WEB-INF/
+-│           │   └── web.xml
+-│           ├── index.html
+-│           ├── login.html
+-│           └── main.html
+-└── spaWeb.iml
+-```
+-
+-## 문제 해결
+-
+-### 컴파일 에러: "Cannot resolve symbol 'jakarta'"
+-
+-- `lib` 폴더에 `jakarta.servlet-api-6.0.0.jar` 파일이 있는지 확인
+-- IntelliJ에서 **File > Invalidate Caches / Restart** 실행
+-- **File > Project Structure > Modules > Dependencies**에서 라이브러리가 추가되었는지 확인
+-
+-### 404 에러
+-
+-- Tomcat이 정상 실행되었는지 확인
+-- URL이 `http://localhost:8080/spaWeb/`인지 확인 (마지막 슬래시 포함)
+-- **Run > Edit Configurations > Deployment**에서 Application context가 `/spaWeb`인지 확인
+-
+-### 로그인 후 바로 로그인 페이지로 돌아감
+-
+-- 브라우저 쿠키가 활성화되어 있는지 확인
+-- 개발자 도구(F12) > Application > Cookies에서 JSESSIONID 쿠키 확인
+-
+-### 필터가 동작하지 않음
+-
+-- `@WebFilter` 어노테이션이 있는지 확인
+-- Tomcat 10 이상을 사용하는지 확인 (Jakarta EE 9+ 필요)
+-
+-## 다음 단계
+-
+-- **SERVLET_README.md**: 상세한 기술 문서
+-- **README.md**: 프로젝트 개요 및 기능 설명
+-
+-## 개발 팁
+-
+-### 코드 수정 후 재배포
+-
+-1. **Build > Build Project** (Ctrl+F9)
+-2. Tomcat이 자동으로 재배포 (Hot Swap)
+-3. 브라우저 새로고침
+-
+-### 디버깅
+-
+-1. 중단점 설정 (코드 라인 번호 옆 클릭)
+-2. **Debug** 버튼 클릭 (Shift+F9)
+-3. 브라우저에서 동작 수행
+-4. IntelliJ에서 변수 값 확인
+-
+-### 로그 확인
+-
+-- IntelliJ 하단의 **Run** 탭에서 Tomcat 로그 확인
+-- `System.out.println()` 출력 확인
+-- 필터 초기화 메시지: "SessionCheckFilter initialized"
+-
+-## 추가 리소스
+-
+-- [Jakarta Servlet Specification](https://jakarta.ee/specifications/servlet/)
+-- [Apache Tomcat Documentation](https://tomcat.apache.org/tomcat-10.1-doc/)
+-- [IntelliJ IDEA Web Development](https://www.jetbrains.com/help/idea/developing-a-java-ee-application.html)
+Index: src/main/webapp/api/login.jsp
+===================================================================
+diff --git a/src/main/webapp/api/login.jsp b/src/main/webapp/api/login.jsp
+deleted file mode 100644
+--- a/src/main/webapp/api/login.jsp	(revision 056c021e94183c9940018bd298bd14f91e5eeda3)
++++ /dev/null	(revision 056c021e94183c9940018bd298bd14f91e5eeda3)
+@@ -1,134 +0,0 @@
+-<%@ page language="java" contentType="application/json; charset=UTF-8" pageEncoding="UTF-8"%>
+-<%@ page import="java.sql.*" %>
+-<%@ page import="com.google.gson.*" %>
+-<%@ page import="java.io.*" %>
+-<%@ page import="java.util.*" %>
+-<%
+-    // JSON 응답 설정
+-    response.setContentType("application/json");
+-    response.setCharacterEncoding("UTF-8");
+-
+-    // JSON 파일에서 응답 메시지 로드
+-    String messagesPath = application.getRealPath("/WEB-INF/response-messages.json");
+-    JsonObject messages = null;
+-
+-    try (FileReader reader = new FileReader(messagesPath)) {
+-        messages = JsonParser.parseReader(reader).getAsJsonObject();
+-    } catch (Exception e) {
+-        e.printStackTrace();
+-    }
+-
+-    // 응답 객체 생성
+-    JsonObject responseJson = new JsonObject();
+-
+-    try {
+-        // 파라미터 받기
+-        String username = request.getParameter("username");
+-        String password = request.getParameter("password");
+-
+-        // 입력값 검증
+-        if (username == null || username.trim().isEmpty() ||
+-            password == null || password.trim().isEmpty()) {
+-
+-            JsonObject loginRequired = messages.getAsJsonObject("LOGIN_REQUIRED");
+-            responseJson.addProperty("success", false);
+-            responseJson.addProperty("code", loginRequired.get("code").getAsString());
+-            responseJson.addProperty("message", loginRequired.get("message").getAsString());
+-            out.print(responseJson.toString());
+-            return;
+-        }
+-
+-        // DB 연결 정보
+-        String dbUrl = "jdbc:mysql://localhost:3307/skn?useSSL=false&characterEncoding=UTF-8";
+-        String dbUser = "root";
+-        String dbPassword = "4563";
+-
+-        Connection conn = null;
+-        PreparedStatement pstmt = null;
+-        ResultSet rs = null;
+-
+-        try {
+-            // JDBC 드라이버 로드
+-            Class.forName("com.mysql.cj.jdbc.Driver");
+-
+-            // DB 연결
+-            conn = DriverManager.getConnection(dbUrl, dbUser, dbPassword);
+-
+-            // SQL 쿼리 실행
+-            String query = "SELECT user_id, user_name, user_level, user_tel \n" +
+-                            "FROM tbl_weekend_member \n" +
+-                            "WHERE user_id = ? \n" +
+-                            "AND user_password = ?;";
+-            String sql = query;
+-            pstmt = conn.prepareStatement(sql);
+-            pstmt.setString(1, username);
+-            pstmt.setString(2, password);
+-
+-            rs = pstmt.executeQuery();
+-
+-            if (rs.next()) {
+-                // 로그인 성공
+-                JsonObject loginSuccess = messages.getAsJsonObject("LOGIN_SUCCESS");
+-
+-                // 세션에 사용자 정보 저장
+-                session.setAttribute("userId", rs.getLong("user_id"));
+-                session.setAttribute("username", rs.getString("user_name"));
+-                session.setAttribute("userLevel", rs.getString("user_level"));
+-                session.setAttribute("phone", rs.getString("user_tel"));
+-
+-
+-                // 사용자 정보 객체 생성
+-                JsonObject userInfo = new JsonObject();
+-                userInfo.addProperty("userId", rs.getLong("user_id"));
+-                userInfo.addProperty("username", rs.getString("user_name"));
+-                userInfo.addProperty("userLevel", rs.getString("user_level"));
+-                userInfo.addProperty("phone", rs.getString("user_tel"));
+-
+-                responseJson.addProperty("success", true);
+-                responseJson.addProperty("code", loginSuccess.get("code").getAsString());
+-                responseJson.addProperty("message", loginSuccess.get("message").getAsString());
+-                responseJson.add("user", userInfo);
+-
+-            } else {
+-                // 로그인 실패
+-                JsonObject loginFailed = messages.getAsJsonObject("LOGIN_FAILED");
+-                responseJson.addProperty("success", false);
+-                responseJson.addProperty("code", loginFailed.get("code").getAsString());
+-                responseJson.addProperty("message", loginFailed.get("message").getAsString());
+-            }
+-
+-        } catch (ClassNotFoundException e) {
+-            // 드라이버 로드 실패
+-            JsonObject dbError = messages.getAsJsonObject("DB_CONNECTION_ERROR");
+-            responseJson.addProperty("success", false);
+-            responseJson.addProperty("code", dbError.get("code").getAsString());
+-            responseJson.addProperty("message", dbError.get("message").getAsString());
+-            e.printStackTrace();
+-
+-        } catch (SQLException e) {
+-            // DB 연결 또는 쿼리 실패
+-            JsonObject dbError = messages.getAsJsonObject("DB_QUERY_ERROR");
+-            responseJson.addProperty("success", false);
+-            responseJson.addProperty("code", dbError.get("code").getAsString());
+-            responseJson.addProperty("message", dbError.get("message").getAsString());
+-            e.printStackTrace();
+-
+-        } finally {
+-            // 리소스 정리
+-            if (rs != null) try { rs.close(); } catch (SQLException e) { e.printStackTrace(); }
+-            if (pstmt != null) try { pstmt.close(); } catch (SQLException e) { e.printStackTrace(); }
+-            if (conn != null) try { conn.close(); } catch (SQLException e) { e.printStackTrace(); }
+-        }
+-
+-    } catch (Exception e) {
+-        // 기타 예외 처리
+-        JsonObject loginError = messages.getAsJsonObject("LOGIN_ERROR");
+-        responseJson.addProperty("success", false);
+-        responseJson.addProperty("code", loginError.get("code").getAsString());
+-        responseJson.addProperty("message", loginError.get("message").getAsString());
+-        e.printStackTrace();
+-    }
+-
+-    // JSON 응답 출력
+-    out.print(responseJson.toString());
+-%>
+Index: WEEKEND_WORK_README.md
+===================================================================
+diff --git a/WEEKEND_WORK_README.md b/WEEKEND_WORK_README.md
+deleted file mode 100644
+--- a/WEEKEND_WORK_README.md	(revision 056c021e94183c9940018bd298bd14f91e5eeda3)
++++ /dev/null	(revision 056c021e94183c9940018bd298bd14f91e5eeda3)
+@@ -1,218 +0,0 @@
+-# 주말근무 관리 시스템
+-
+-## 개요
+-
+-로그인 성공 시 메인 화면에 주말근무 관리 그리드가 표시되며, 페이징 기능을 포함한 데이터 조회가 가능합니다.
+-
+-## 구현 내용
+-
+-### 1. 데이터베이스
+-
+-**테이블**: `tbl_weekend_work`
+-- 25건의 더미 데이터 포함
+-- 직원명, 부서, 근무일자, 시간, 근무유형, 승인상태 등 관리
+-
+-**위치**: `src/main/resources/schema.sql`
+-
+-### 2. 백엔드 (Java Servlet)
+-
+-#### 파일 구조
+-```
+-src/main/java/com/example/
+-├── util/
+-│   └── DBConnection.java          # 데이터베이스 연결 유틸리티
+-└── servlet/
+-    └── WeekendWorkServlet.java    # 주말근무 서블릿 (직접 DB 처리)
+-
+-src/main/webapp/api/
+-└── weekend-work.jsp               # JSP 브릿지 (Servlet으로 전달)
+-```
+-
+-#### API 엔드포인트
+-
+-**GET** `/api/weekend-work.jsp` → **Servlet** `/weekend-work`
+-- 주말근무 목록 조회 (페이징)
+-- **아키텍처**: JSP 브릿지 → Servlet (직접 DB 처리)
+-- 파라미터:
+-  - `page`: 페이지 번호 (기본값: 1)
+-  - `size`: 페이지당 레코드 수 (기본값: 10)
+-- 응답 예시:
+-```json
+-{
+-  "success": true,
+-  "data": [...],
+-  "pagination": {
+-    "currentPage": 1,
+-    "pageSize": 10,
+-    "totalCount": 25,
+-    "totalPages": 3
+-  }
+-}
+-```
+-
+-**Note**:
+-- JSP는 브릿지 역할만 수행 (RequestDispatcher로 Servlet에 전달)
+-- Servlet에서 직접 DB 연결 및 비즈니스 로직 처리
+-- DAO/Model 계층 없이 SPA 형태로 구현
+-
+-### 3. 프론트엔드 (HTML/JavaScript)
+-
+-**파일**: `src/main/webapp/main.html`
+-
+-#### 주요 기능
+-- ✅ 로그인 성공 시 메인 화면에 주말근무 그리드 표시
+-- ✅ 페이징 기능 (이전/다음, 페이지 번호)
+-- ✅ 반응형 테이블 디자인
+-- ✅ 승인 상태별 색상 구분 (승인/대기/반려)
+-- ✅ 실시간 데이터 로딩
+-
+-#### 그리드 컬럼
+-1. 번호
+-2. 직원명
+-3. 부서
+-4. 근무일자
+-5. 시작시간
+-6. 종료시간
+-7. 근무시간
+-8. 근무유형
+-9. 근무사유
+-10. 상태 (배지 형태)
+-
+-## 설치 및 실행
+-
+-### 1. 데이터베이스 설정
+-
+-```bash
+-# MySQL 접속
+-mysql -u root -p
+-
+-# 데이터베이스 생성
+-CREATE DATABASE spa_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+-
+-# 테이블 생성 및 더미 데이터 삽입
+-USE spa_db;
+-source src/main/resources/schema.sql;
+-```
+-
+-자세한 내용은 `DATABASE_SETUP.md` 참조
+-
+-### 2. 데이터베이스 연결 정보 확인
+-
+-`src/main/java/com/example/util/DBConnection.java` 파일에서 연결 정보를 확인하고 필요시 수정:
+-
+-```java
+-private static final String URL = "jdbc:mysql://localhost:3306/spa_db?useSSL=false&serverTimezone=Asia/Seoul&characterEncoding=UTF-8";
+-private static final String USER = "root";
+-private static final String PASSWORD = "root";
+-```
+-
+-### 3. 애플리케이션 실행
+-
+-1. Tomcat 서버 시작
+-2. 브라우저에서 `http://localhost:8080/spaWeb` 접속
+-3. 로그인 (admin / admin123)
+-4. 메인 화면에서 주말근무 관리 그리드 확인
+-
+-## 사용 방법
+-
+-### 로그인
+-- 아이디: `admin`
+-- 비밀번호: `admin123`
+-
+-### 주말근무 데이터 조회
+-1. 로그인 성공 시 자동으로 메인 화면에 주말근무 그리드가 표시됩니다
+-2. 페이지 하단의 페이징 버튼으로 다른 페이지 조회 가능
+-3. 각 페이지당 10건의 데이터가 표시됩니다
+-
+-### 페이징 기능
+-- **이전/다음 버튼**: 이전/다음 페이지로 이동
+-- **페이지 번호**: 특정 페이지로 직접 이동
+-- **페이지 정보**: 현재 페이지 및 전체 데이터 건수 표시
+-
+-## 화면 구성
+-
+-### 메인 화면 (로그인 후)
+-```
+-┌─────────────────────────────────────────┐
+-│ SPA System              사용자 [로그아웃] │
+-├─────────────────────────────────────────┤
+-│  홈  │ 대시보드 │ 데이터관리 │ 설정      │
+-├─────────────────────────────────────────┤
+-│                                         │
+-│  주말근무 관리                           │
+-│  ─────────────────────────────────────  │
+-│                                         │
+-│  전체 25건 (1 / 3 페이지)               │
+-│                                         │
+-│  ┌───────────────────────────────────┐  │
+-│  │ 번호│직원명│부서│근무일자│...│상태│  │
+-│  ├───────────────────────────────────┤  │
+-│  │  1  │김철수│개발│2024-01-06│...│승인│  │
+-│  │  2  │이영희│기획│2024-01-07│...│승인│  │
+-│  │ ...                               │  │
+-│  └───────────────────────────────────┘  │
+-│                                         │
+-│  [이전] [1] [2] [3] [다음]              │
+-│                                         │
+-└─────────────────────────────────────────┘
+-```
+-
+-## 기술 스택
+-
+-- **Backend**: Java Servlet (직접 DB 처리), JSP (브릿지), JDBC
+-- **Frontend**: HTML5, CSS3, Vanilla JavaScript (SPA)
+-- **Database**: MySQL 8.x
+-- **Server**: Apache Tomcat 10.x
+-- **Library**: Gson (JSON 처리)
+-
+-## 아키텍처
+-
+-```
+-[Browser]
+-    ↓ fetch('/api/weekend-work.jsp')
+-[JSP Bridge] (weekend-work.jsp)
+-    ↓ RequestDispatcher.forward()
+-[Servlet] (WeekendWorkServlet.java)
+-    ↓ Direct JDBC
+-[MySQL Database] (tbl_weekend_work)
+-```
+-
+-**특징**:
+-- DAO/Model 계층 없이 Servlet에서 직접 DB 처리
+-- JSP는 단순 브릿지 역할만 수행
+-- SPA 형태로 클라이언트 사이드 라우팅
+-
+-## 주요 특징
+-
+-1. **SPA (Single Page Application)**: 해시 라우팅을 통한 페이지 전환
+-2. **RESTful API**: JSON 기반 데이터 통신
+-3. **페이징 처리**: 서버 사이드 페이징으로 성능 최적화
+-4. **반응형 디자인**: 다양한 화면 크기 지원
+-5. **상태 관리**: 세션 기반 인증 및 상태 관리
+-
+-## 향후 개선 사항
+-
+-- [ ] 검색 기능 추가
+-- [ ] 정렬 기능 추가
+-- [ ] 상세 보기 모달
+-- [ ] 등록/수정/삭제 기능
+-- [ ] 엑셀 다운로드 기능
+-- [ ] 필터링 기능 (부서별, 상태별)
+-
+-## 문제 해결
+-
+-### 데이터가 표시되지 않는 경우
+-1. 데이터베이스 연결 확인
+-2. 브라우저 콘솔에서 에러 메시지 확인
+-3. JSP 파일 경로 확인 (`/api/weekend-work.jsp`)
+-4. Servlet 매핑 확인 (`@WebServlet("/weekend-work")`)
+-5. MySQL 서버 실행 상태 확인
+-
+-### 한글이 깨지는 경우
+-1. 데이터베이스 문자셋 확인 (utf8mb4)
+-2. JSP 페이지 인코딩 설정 확인 (UTF-8)
+-3. HTML meta charset 확인
+-
+-## 라이선스
+-
+-MIT License
+Index: ARCHITECTURE.md
+===================================================================
+diff --git a/ARCHITECTURE.md b/ARCHITECTURE.md
+deleted file mode 100644
+--- a/ARCHITECTURE.md	(revision 056c021e94183c9940018bd298bd14f91e5eeda3)
++++ /dev/null	(revision 056c021e94183c9940018bd298bd14f91e5eeda3)
+@@ -1,194 +0,0 @@
+-# 주말근무 관리 시스템 아키텍처
+-
+-## 전체 구조
+-
+-이 프로젝트는 **JSP 브릿지 + Servlet 직접 처리** 방식의 SPA(Single Page Application)입니다.
+-
+-```
+-┌─────────────────────────────────────────────────────────────┐
+-│                         Browser (SPA)                        │
+-│                    main.html (Hash Routing)                  │
+-└─────────────────────────────────────────────────────────────┘
+-                              ↓
+-                    fetch('/api/weekend-work.jsp')
+-                              ↓
+-┌─────────────────────────────────────────────────────────────┐
+-│                      JSP Bridge Layer                        │
+-│                   weekend-work.jsp                           │
+-│         (RequestDispatcher.forward("/weekend-work"))         │
+-└─────────────────────────────────────────────────────────────┘
+-                              ↓
+-┌─────────────────────────────────────────────────────────────┐
+-│                    Servlet Layer (직접 처리)                  │
+-│                  WeekendWorkServlet.java                     │
+-│              - 페이징 로직                                     │
+-│              - 직접 JDBC 연결                                  │
+-│              - JSON 응답 생성                                  │
+-└─────────────────────────────────────────────────────────────┘
+-                              ↓
+-                    DBConnection.getConnection()
+-                              ↓
+-┌─────────────────────────────────────────────────────────────┐
+-│                      Database Layer                          │
+-│                  MySQL (tbl_weekend_work)                    │
+-└─────────────────────────────────────────────────────────────┘
+-```
+-
+-## 계층별 역할
+-
+-### 1. Frontend (Browser)
+-- **파일**: `main.html`
+-- **역할**:
+-  - SPA 형태의 클라이언트 사이드 라우팅 (Hash Routing)
+-  - 주말근무 그리드 렌더링
+-  - 페이징 UI 처리
+-  - AJAX 통신 (fetch API)
+-
+-### 2. JSP Bridge Layer
+-- **파일**: `api/weekend-work.jsp`
+-- **역할**:
+-  - 단순 브릿지 역할만 수행
+-  - RequestDispatcher로 Servlet에 요청 전달
+-  - 직접적인 비즈니스 로직 없음
+-
+-```jsp
+-<%
+-    request.getRequestDispatcher("/weekend-work").forward(request, response);
+-%>
+-```
+-
+-### 3. Servlet Layer
+-- **파일**: `servlet/WeekendWorkServlet.java`
+-- **역할**:
+-  - 모든 비즈니스 로직 처리
+-  - 직접 JDBC를 통한 DB 연결
+-  - 페이징 처리
+-  - JSON 응답 생성 (Gson 사용)
+-  - 에러 핸들링
+-
+-**주요 메서드**:
+-- `doGet()`: HTTP GET 요청 처리
+-- `getTotalCount()`: 전체 레코드 수 조회
+-- `getWeekendWorkList()`: 페이징된 데이터 조회
+-
+-### 4. Database Utility
+-- **파일**: `util/DBConnection.java`
+-- **역할**:
+-  - MySQL 연결 관리
+-  - Connection Pool 역할
+-
+-### 5. Database
+-- **테이블**: `tbl_weekend_work`
+-- **레코드**: 25건의 더미 데이터
+-
+-## 데이터 흐름
+-
+-### 조회 요청 흐름
+-
+-```
+-1. 사용자가 로그인 → main.html 로드
+-   ↓
+-2. loadWeekendWorkData() 함수 실행
+-   ↓
+-3. fetch('api/weekend-work.jsp?page=1&size=10')
+-   ↓
+-4. JSP가 요청을 받아 Servlet으로 forward
+-   ↓
+-5. WeekendWorkServlet.doGet() 실행
+-   ↓
+-6. 파라미터 검증 (page, size)
+-   ↓
+-7. DBConnection.getConnection()으로 DB 연결
+-   ↓
+-8. SQL 실행 (SELECT with LIMIT/OFFSET)
+-   ↓
+-9. ResultSet → Map<String, Object> 변환
+-   ↓
+-10. Gson으로 JSON 변환
+-   ↓
+-11. HTTP Response로 JSON 반환
+-   ↓
+-12. 브라우저에서 JSON 파싱
+-   ↓
+-13. renderWeekendWorkGrid() 함수로 그리드 렌더링
+-```
+-
+-## 왜 이 구조를 선택했는가?
+-
+-### DAO/Model 계층을 제거한 이유
+-1. **단순성**: 작은 프로젝트에서 과도한 계층화 방지
+-2. **직접성**: Servlet에서 직접 DB 처리로 명확한 흐름
+-3. **SPA 특성**: 클라이언트 중심 아키텍처에 적합
+-
+-### JSP를 브릿지로 사용하는 이유
+-1. **URL 일관성**: `/api/*.jsp` 형태의 일관된 엔드포인트
+-2. **유연성**: 필요시 JSP에서 전처리 가능
+-3. **호환성**: 기존 JSP 기반 프로젝트와의 통합 용이
+-
+-### Servlet에서 직접 DB 처리하는 이유
+-1. **성능**: 불필요한 계층 제거로 오버헤드 감소
+-2. **명확성**: 한 곳에서 모든 로직 확인 가능
+-3. **유지보수**: 작은 프로젝트에서 관리 포인트 최소화
+-
+-## 확장 가능성
+-
+-### 향후 기능 추가 시
+-1. **검색/필터링**: Servlet의 SQL 쿼리만 수정
+-2. **등록/수정/삭제**: doPost(), doPut(), doDelete() 메서드 추가
+-3. **권한 관리**: Servlet에서 세션 체크 로직 추가
+-4. **파일 업로드**: MultipartConfig 추가
+-
+-### 계층 분리가 필요한 경우
+-프로젝트가 커지면 다음과 같이 리팩토링 가능:
+-```
+-Servlet → Service → DAO → Database
+-```
+-
+-## 보안 고려사항
+-
+-1. **SQL Injection 방지**: PreparedStatement 사용
+-2. **XSS 방지**: JSON 응답으로 HTML 직접 출력 없음
+-3. **세션 관리**: 로그인 체크 필터 적용
+-4. **인코딩**: UTF-8 일관성 유지
+-
+-## 성능 최적화
+-
+-1. **페이징**: LIMIT/OFFSET으로 필요한 데이터만 조회
+-2. **Connection 관리**: try-with-resources로 자동 close
+-3. **JSON 직렬화**: Gson 라이브러리 사용
+-4. **클라이언트 캐싱**: SPA로 페이지 리로드 최소화
+-
+-## 파일 구조 요약
+-
+-```
+-spaWeb/
+-├── src/main/
+-│   ├── java/com/example/
+-│   │   ├── util/
+-│   │   │   └── DBConnection.java          # DB 연결 유틸
+-│   │   ├── servlet/
+-│   │   │   ├── LoginServlet.java          # 로그인 처리
+-│   │   │   ├── LogoutServlet.java         # 로그아웃 처리
+-│   │   │   └── WeekendWorkServlet.java    # 주말근무 API
+-│   │   └── filter/
+-│   │       └── SessionCheckFilter.java    # 세션 체크
+-│   ├── resources/
+-│   │   └── schema.sql                     # DB 스키마
+-│   └── webapp/
+-│       ├── api/
+-│       │   └── weekend-work.jsp           # JSP 브릿지
+-│       ├── login.html                     # 로그인 페이지
+-│       └── main.html                      # 메인 페이지 (SPA)
+-├── DATABASE_SETUP.md                      # DB 설정 가이드
+-├── WEEKEND_WORK_README.md                 # 사용 가이드
+-└── ARCHITECTURE.md                        # 이 문서
+-```
+-
+-## 결론
+-
+-이 아키텍처는 **단순성과 효율성**을 추구하는 SPA 프로젝트에 적합합니다.
+-- JSP는 브릿지 역할만
+-- Servlet이 모든 비즈니스 로직 처리
+-- 클라이언트는 SPA로 동적 렌더링
+-
+-필요에 따라 계층을 추가하거나 마이크로서비스로 분리할 수 있는 유연한 구조입니다.
+Index: .idea/SweepConfig.xml
+===================================================================
+diff --git a/.idea/SweepConfig.xml b/.idea/SweepConfig.xml
+deleted file mode 100644
+--- a/.idea/SweepConfig.xml	(revision 056c021e94183c9940018bd298bd14f91e5eeda3)
++++ /dev/null	(revision 056c021e94183c9940018bd298bd14f91e5eeda3)
+@@ -1,14 +0,0 @@
+-<?xml version="1.0" encoding="UTF-8"?>
+-<project version="4">
+-  <component name="dev.sweep.assistant.components.SweepConfig">
+-    <option name="autoApprovedTools">
+-      <set>
+-        <option value="list_files" />
+-        <option value="read_file" />
+-        <option value="search_files" />
+-        <option value="find_usages" />
+-        <option value="get_errors" />
+-      </set>
+-    </option>
+-  </component>
+-</project>
+\ No newline at end of file
+Index: .idea/kotlinc.xml
+===================================================================
+diff --git a/.idea/kotlinc.xml b/.idea/kotlinc.xml
+deleted file mode 100644
+--- a/.idea/kotlinc.xml	(revision 056c021e94183c9940018bd298bd14f91e5eeda3)
++++ /dev/null	(revision 056c021e94183c9940018bd298bd14f91e5eeda3)
+@@ -1,13 +0,0 @@
+-<?xml version="1.0" encoding="UTF-8"?>
+-<project version="4">
+-  <component name="Kotlin2JsCompilerArguments">
+-    <option name="moduleKind" value="plain" />
+-  </component>
+-  <component name="Kotlin2JvmCompilerArguments">
+-    <option name="jvmTarget" value="1.8" />
+-  </component>
+-  <component name="KotlinCommonCompilerArguments">
+-    <option name="apiVersion" value="2.2" />
+-    <option name="languageVersion" value="2.2" />
+-  </component>
+-</project>
+\ No newline at end of file
+Index: SERVLET_README.md
+===================================================================
+diff --git a/SERVLET_README.md b/SERVLET_README.md
+deleted file mode 100644
+--- a/SERVLET_README.md	(revision 056c021e94183c9940018bd298bd14f91e5eeda3)
++++ /dev/null	(revision 056c021e94183c9940018bd298bd14f91e5eeda3)
+@@ -1,344 +0,0 @@
+-# SPA 웹 애플리케이션 - Java 21 서블릿 기반
+-
+-## 프로젝트 개요
+-
+-Java 21 기반의 서블릿과 필터를 사용하여 세션 체크 및 인증을 처리하는 SPA(Single Page Application) 웹 애플리케이션입니다.
+-
+-## 프로젝트 구조
+-
+-```
+-spaWeb/
+-├── src/
+-│   └── main/
+-│       ├── java/
+-│       │   └── com/
+-│       │       └── example/
+-│       │           ├── servlet/
+-│       │           │   ├── LoginServlet.java      # 로그인 처리
+-│       │           │   └── LogoutServlet.java     # 로그아웃 처리
+-│       │           └── filter/
+-│       │               └── SessionCheckFilter.java # 세션 체크 필터
+-│       └── webapp/
+-│           ├── WEB-INF/
+-│           │   └── web.xml                        # 웹 애플리케이션 설정
+-│           ├── index.html                         # 진입점
+-│           ├── login.html                         # 로그인 페이지
+-│           └── main.html                          # 메인 SPA 페이지
+-└── README.md
+-```
+-
+-## 주요 컴포넌트
+-
+-### 1. LoginServlet (`/login`)
+-
+-- **역할**: 사용자 인증 처리
+-- **메서드**: POST
+-- **기능**:
+-    - 사용자 아이디/비밀번호 검증
+-    - 세션 생성 및 사용자 정보 저장
+-    - JSON 응답 반환
+-
+-**요청 예시**:
+-
+-```javascript
+-fetch('login', {
+-    method: 'POST',
+-    headers: {
+-        'Content-Type': 'application/x-www-form-urlencoded',
+-    },
+-    body: new URLSearchParams({
+-        'username': 'admin',
+-        'password': 'admin123'
+-    })
+-})
+-```
+-
+-**응답 예시**:
+-
+-```json
+-{
+-    "success": true,
+-    "message": "로그인 성공",
+-    "username": "admin"
+-}
+-```
+-
+-### 2. LogoutServlet (`/logout`)
+-
+-- **역할**: 로그아웃 처리
+-- **메서드**: GET, POST
+-- **기능**:
+-    - 세션 무효화
+-    - 로그인 페이지로 리다이렉트 또는 JSON 응답
+-
+-### 3. SessionCheckFilter
+-
+-- **역할**: 모든 요청에 대한 세션 검증
+-- **적용 범위**: `/*` (모든 URL)
+-- **제외 URL**:
+-    - `/login.html` - 로그인 페이지
+-    - `/login` - 로그인 서블릿
+-    - `/index.html` - 진입점
+-    - `/logout` - 로그아웃 서블릿
+-    - 정적 리소스 (`.css`, `.js`, `.jpg`, `.png` 등)
+-
+-**동작 방식**:
+-
+-1. 요청 URL이 제외 목록에 있는지 확인
+-2. 세션 존재 여부 확인
+-3. 세션이 없으면:
+-    - AJAX 요청: JSON 응답 (401 Unauthorized)
+-    - 일반 요청: `login.html`로 리다이렉트
+-4. 세션이 있으면: 요청 계속 진행
+-
+-## 세션 관리
+-
+-### 세션 속성
+-
+-- `isLoggedIn` (Boolean): 로그인 상태
+-- `username` (String): 사용자 아이디
+-- `loginTime` (Long): 로그인 시간 (밀리초)
+-
+-### 세션 타임아웃
+-
+-- **기본값**: 30분
+-- **설정 위치**: `web.xml`
+-
+-```xml
+-<session-config>
+-    <session-timeout>30</session-timeout>
+-</session-config>
+-```
+-
+-## 기술 스택
+-
+-- **Java**: 21
+-- **Jakarta Servlet API**: 6.0.0
+-- **빌드 도구**: Maven
+-- **웹 서버**: Tomcat 10+ (Jakarta EE 9+)
+-
+-## 의존성 (수동 설정)
+-
+-이 프로젝트는 Maven/Gradle을 사용하지 않고 `lib` 폴더에 직접 JAR 파일을 추가하는 방식을 사용합니다.
+-
+-### 필요한 JAR 파일
+-
+-#### 1. Jakarta Servlet API (필수)
+-
+-- **파일명**: `jakarta.servlet-api-6.0.0.jar`
+-- **다운로드
+-  **: [Maven Central](https://repo1.maven.org/maven2/jakarta/servlet/jakarta.servlet-api/6.0.0/jakarta.servlet-api-6.0.0.jar)
+-- **위치**: `lib/jakarta.servlet-api-6.0.0.jar`
+-
+-#### 2. Gson (선택사항 - JSON 처리용)
+-
+-- **파일명**: `gson-2.10.1.jar`
+-- **다운로드**: [Maven Central](https://repo1.maven.org/maven2/com/google/code/gson/gson/2.10.1/gson-2.10.1.jar)
+-- **위치**: `lib/gson-2.10.1.jar`
+-
+-### IntelliJ IDEA에서 라이브러리 추가 방법
+-
+-1. **File > Project Structure** (Ctrl+Alt+Shift+S)
+-2. **Modules > Dependencies** 탭 선택
+-3. **+ 버튼 > JARs or directories** 클릭
+-4. `lib` 폴더의 JAR 파일들 선택
+-5. **Scope**를 **Provided**로 설정 (jakarta.servlet-api의 경우)
+-6. **Apply > OK**
+-
+-또는 `.iml` 파일에 직접 추가:
+-
+-```xml
+-<orderEntry type="module-library" scope="PROVIDED">
+-  <library>
+-    <CLASSES>
+-      <root url="jar://$MODULE_DIR$/lib/jakarta.servlet-api-6.0.0.jar!/" />
+-    </CLASSES>
+-  </library>
+-</orderEntry>
+-```
+-
+-## 빌드 및 배포
+-
+-### WAR 파일 생성 (수동)
+-
+-1. **컴파일**:
+-
+-```bash
+-# src/main/java 디렉토리에서
+-javac -cp "lib/*" -d WEB-INF/classes com/example/servlet/*.java com/example/filter/*.java
+-```
+-
+-2. **WAR 파일 생성**:
+-
+-```bash
+-# src/main/webapp 디렉토리에서
+-jar -cvf spaWeb.war *
+-```
+-
+-또는 IntelliJ IDEA의 **Build > Build Artifacts** 사용
+-
+-### Tomcat 배포
+-
+-1. Tomcat 10 이상 설치
+-2. WAR 파일을 `TOMCAT_HOME/webapps/` 디렉토리에 복사
+-3. Tomcat 시작
+-
+-```bash
+-# Windows
+-TOMCAT_HOME\bin\startup.bat
+-
+-# Linux/Mac
+-TOMCAT_HOME/bin/startup.sh
+-```
+-
+-4. 브라우저에서 접속
+-
+-```
+-http://localhost:8080/spaWeb/
+-```
+-
+-### IntelliJ IDEA에서 실행
+-
+-1. **Run > Edit Configurations**
+-2. **+ > Tomcat Server > Local**
+-3. **Deployment 탭**:
+-    - **+ > Artifact > spaWeb:war exploded**
+-    - Application context: `/spaWeb`
+-4. **Run** 버튼 클릭
+-
+-## 로그인 정보
+-
+-- **아이디**: `admin`
+-- **비밀번호**: `admin123`
+-
+-## 주요 기능
+-
+-### 1. 자동 세션 체크
+-
+-- 필터가 모든 요청을 가로채서 세션 확인
+-- 로그인하지 않은 사용자는 자동으로 `login.html`로 리다이렉트
+-
+-### 2. 해시 라우팅 (SPA)
+-
+-- 4개의 GNB 메뉴: 홈, 대시보드, 데이터 관리, 설정
+-- URL 해시 변경으로 페이지 전환
+-- 브라우저 뒤로가기/앞으로가기 지원
+-
+-### 3. 서버 사이드 세션
+-
+-- `sessionStorage` 대신 서버 세션 사용
+-- 보안성 향상
+-- 브라우저를 닫아도 세션 유지 (타임아웃 전까지)
+-
+-## 보안 고려사항
+-
+-### 현재 구현 (데모용)
+-
+-- 하드코딩된 사용자 인증
+-- 평문 비밀번호 비교
+-
+-### 프로덕션 환경 권장사항
+-
+-1. **데이터베이스 연동**
+-    - 사용자 정보를 DB에 저장
+-    - PreparedStatement 사용 (SQL Injection 방지)
+-
+-2. **비밀번호 해싱**
+-    - BCrypt, PBKDF2 등 사용
+-    - 솔트(Salt) 추가
+-
+-3. **HTTPS 사용**
+-    - SSL/TLS 인증서 적용
+-    - 세션 쿠키 Secure 플래그 활성화
+-
+-4. **CSRF 방지**
+-    - CSRF 토큰 구현
+-    - SameSite 쿠키 속성 설정
+-
+-5. **입력값 검증**
+-    - XSS 방지
+-    - 입력값 길이 제한
+-
+-## 커스터마이징
+-
+-### 세션 타임아웃 변경
+-
+-`web.xml` 수정:
+-
+-```xml
+-<session-config>
+-    <session-timeout>60</session-timeout> <!-- 60분 -->
+-</session-config>
+-```
+-
+-### 제외 URL 추가
+-
+-`SessionCheckFilter.java` 수정:
+-
+-```java
+-private static final List<String> EXCLUDE_URLS = Arrays.asList(
+-    "/login.html",
+-    "/login",
+-    "/index.html",
+-    "/logout",
+-    "/public"  // 추가
+-);
+-```
+-
+-### 데이터베이스 연동 예시
+-
+-```java
+-private boolean authenticate(String username, String password) {
+-    try (Connection conn = dataSource.getConnection();
+-         PreparedStatement pstmt = conn.prepareStatement(
+-             "SELECT password FROM users WHERE username = ?")) {
+-
+-        pstmt.setString(1, username);
+-        ResultSet rs = pstmt.executeQuery();
+-
+-        if (rs.next()) {
+-            String hashedPassword = rs.getString("password");
+-            return BCrypt.checkpw(password, hashedPassword);
+-        }
+-    } catch (SQLException e) {
+-        e.printStackTrace();
+-    }
+-    return false;
+-}
+-```
+-
+-## 트러블슈팅
+-
+-### 1. 404 에러 발생
+-
+-- Tomcat이 정상 실행되었는지 확인
+-- WAR 파일이 제대로 배포되었는지 확인
+-- URL 경로 확인 (`/spaWeb/` 포함)
+-
+-### 2. 세션이 유지되지 않음
+-
+-- 쿠키가 활성화되어 있는지 확인
+-- 브라우저 개발자 도구에서 JSESSIONID 쿠키 확인
+-- 세션 타임아웃 설정 확인
+-
+-### 3. 필터가 동작하지 않음
+-
+-- `@WebFilter` 어노테이션 확인
+-- 서블릿 컨테이너가 어노테이션을 스캔하는지 확인
+-- `web.xml`에서 `metadata-complete="false"` 설정
+-
+-### 4. Jakarta vs Javax
+-
+-- Java EE 8 이하: `javax.servlet.*`
+-- Jakarta EE 9 이상: `jakarta.servlet.*`
+-- Tomcat 10+는 Jakarta EE 9+ 사용
+-
+-## 참고 자료
+-
+-- [Jakarta Servlet Specification](https://jakarta.ee/specifications/servlet/)
+-- [Apache Tomcat Documentation](https://tomcat.apache.org/tomcat-10.1-doc/)
+-- [eGovFrame 표준프레임워크](https://www.egovframe.go.kr/)
+-
+-## 라이선스
+-
+-MIT License
+Index: .idea/scopes/scope_settings.xml
+===================================================================
+diff --git a/.idea/scopes/scope_settings.xml b/.idea/scopes/scope_settings.xml
+deleted file mode 100644
+--- a/.idea/scopes/scope_settings.xml	(revision 056c021e94183c9940018bd298bd14f91e5eeda3)
++++ /dev/null	(revision 056c021e94183c9940018bd298bd14f91e5eeda3)
+@@ -1,5 +0,0 @@
+-<component name="DependencyValidationManager">
+-  <state>
+-    <deny_rule from_scope="All" to_scope="All" is_deny="false" />
+-  </state>
+-</component>
+\ No newline at end of file
+Index: .idea/artifacts/unnamed.xml
+===================================================================
+diff --git a/.idea/artifacts/unnamed.xml b/.idea/artifacts/unnamed.xml
+deleted file mode 100644
+--- a/.idea/artifacts/unnamed.xml	(revision 056c021e94183c9940018bd298bd14f91e5eeda3)
++++ /dev/null	(revision 056c021e94183c9940018bd298bd14f91e5eeda3)
+@@ -1,13 +0,0 @@
+-<component name="ArtifactManager">
+-  <artifact type="exploded-war" name="unnamed">
+-    <output-path>$PROJECT_DIR$/src/main/webapp/artifacts/unnamed</output-path>
+-    <root id="root">
+-      <element id="directory" name="WEB-INF">
+-        <element id="directory" name="lib">
+-          <element id="library" level="project" name="lib" />
+-        </element>
+-      </element>
+-      <element id="library" level="project" name="lib1" />
+-    </root>
+-  </artifact>
+-</component>
+\ No newline at end of file
+Index: src/main/resources/schema.sql
+===================================================================
+diff --git a/src/main/resources/schema.sql b/src/main/resources/schema.sql
+deleted file mode 100644
+--- a/src/main/resources/schema.sql	(revision 056c021e94183c9940018bd298bd14f91e5eeda3)
++++ /dev/null	(revision 056c021e94183c9940018bd298bd14f91e5eeda3)
+@@ -1,134 +0,0 @@
+--- 일용직 주말 근태관리 시스템 회원 더미 데이터 삽입
+-INSERT INTO `tbl_weekend_member` (
+-    `user_id`,
+-    `user_password`,
+-    `user_name`,
+-    `user_tel`,
+-    `user_level`,
+-    `writer`,
+-    `created_at`
+-) VALUES
+--- 1~5번
+-('user_001', '123', '김철수', '010-1234-0001', 'A', 'admin', UNIX_TIMESTAMP(NOW())),
+-('user_002', '123', '이영희', '010-1234-0002', 'B', 'admin', UNIX_TIMESTAMP(NOW())),
+-('user_003', '123', '박민수', '010-1234-0003', 'A', 'admin', UNIX_TIMESTAMP(NOW())),
+-('user_004', '123', '정수진', '010-1234-0004', 'B', 'admin', UNIX_TIMESTAMP(NOW())),
+-('user_005', '123', '최동욱', '010-1234-0005', 'A', 'admin', UNIX_TIMESTAMP(NOW())),
+-
+--- 6~10번
+-('user_006', '123', '강민지', '010-1234-0006', 'B', 'admin', UNIX_TIMESTAMP(NOW())),
+-('user_007', '123', '윤서준', '010-1234-0007', 'A', 'admin', UNIX_TIMESTAMP(NOW())),
+-('user_008', '123', '한지민', '010-1234-0008', 'B', 'admin', UNIX_TIMESTAMP(NOW())),
+-('user_009', '123', '오태양', '010-1234-0009', 'A', 'admin', UNIX_TIMESTAMP(NOW())),
+-('user_010', '123', '신하늘', '010-1234-0010', 'B', 'admin', UNIX_TIMESTAMP(NOW())),
+-
+--- 11~15번
+-('user_011', '123', '배준호', '010-1234-0011', 'A', 'admin', UNIX_TIMESTAMP(NOW())),
+-('user_012', '123', '임소라', '010-1234-0012', 'B', 'admin', UNIX_TIMESTAMP(NOW())),
+-('user_013', '123', '조현우', '010-1234-0013', 'A', 'admin', UNIX_TIMESTAMP(NOW())),
+-('user_014', '123', '송미래', '010-1234-0014', 'B', 'admin', UNIX_TIMESTAMP(NOW())),
+-('user_015', '123', '홍길동', '010-1234-0015', 'A', 'admin', UNIX_TIMESTAMP(NOW())),
+-
+--- 16~20번
+-('user_016', '123', '김나라', '010-1234-0016', 'B', 'admin', UNIX_TIMESTAMP(NOW())),
+-('user_017', '123', '이세계', '010-1234-0017', 'A', 'admin', UNIX_TIMESTAMP(NOW())),
+-('user_018', '123', '박하늘', '010-1234-0018', 'B', 'admin', UNIX_TIMESTAMP(NOW())),
+-('user_019', '123', '정바다', '010-1234-0019', 'A', 'admin', UNIX_TIMESTAMP(NOW())),
+-('user_020', '123', '최별', '010-1234-0020', 'B', 'admin', UNIX_TIMESTAMP(NOW())),
+-
+--- 21~25번
+-('user_021', '123', '강산', '010-1234-0021', 'A', 'admin', UNIX_TIMESTAMP(NOW())),
+-('user_022', '123', '윤달', '010-1234-0022', 'B', 'admin', UNIX_TIMESTAMP(NOW())),
+-('user_023', '123', '한별', '010-1234-0023', 'A', 'admin', UNIX_TIMESTAMP(NOW())),
+-('user_024', '123', '오늘', '010-1234-0024', 'B', 'admin', UNIX_TIMESTAMP(NOW())),
+-('user_025', '123', '신세계', '010-1234-0025', 'A', 'admin', UNIX_TIMESTAMP(NOW()));
+-
+-INSERT INTO `tbl_weekend_work` (
+-    `user_id`,
+-    `user_name`,
+-    `user_tel`,
+-    `user_level`,
+-    `user_dept`,
+-    `start_at`,
+-    `end_at`,
+-    `etc_comment`,
+-    `week_flag`,
+-    `confirm_yn`,
+-    `writer`,
+-    `created_at`
+-) VALUES
+-
+--- 일용직 주말 근태관리 시스템 근태 현황 더미 데이터 삽입
+-('user_001', '김철수', '010-1234-0001', 'A', 'D', UNIX_TIMESTAMP('2024-01-06 09:00:00'), UNIX_TIMESTAMP('2024-01-06 18:00:00'), '긴급 시스템 점검', '0', 'Y', 'admin', UNIX_TIMESTAMP(NOW())),
+-
+--- 2. 이영희 (기획팀, 2024-01-07 일)
+-('user_002', '이영희', '010-1234-0002', 'B', 'P', UNIX_TIMESTAMP('2024-01-07 10:00:00'), UNIX_TIMESTAMP('2024-01-07 15:00:00'), '프로젝트 마감', '1', 'Y', 'admin', UNIX_TIMESTAMP(NOW())),
+-
+--- 3. 박민수 (개발팀, 2024-01-13 토)
+-('user_003', '박민수', '010-1234-0003', 'A', 'D', UNIX_TIMESTAMP('2024-01-13 09:00:00'), UNIX_TIMESTAMP('2024-01-13 17:00:00'), '서버 업그레이드', '0', 'Y', 'admin', UNIX_TIMESTAMP(NOW())),
+-
+--- 4. 정수진 (디자인팀, 2024-01-14 일)
+-('user_004', '정수진', '010-1234-0004', 'B', 'S', UNIX_TIMESTAMP('2024-01-14 13:00:00'), UNIX_TIMESTAMP('2024-01-14 18:00:00'), 'UI 개선 작업', '1', 'N', 'admin', UNIX_TIMESTAMP(NOW())),
+-
+--- 5. 최동욱 (개발팀, 2024-01-20 토)
+-('user_005', '최동욱', '010-1234-0005', 'A', 'D', UNIX_TIMESTAMP('2024-01-20 09:00:00'), UNIX_TIMESTAMP('2024-01-20 18:00:00'), '데이터베이스 마이그레이션', '0', 'Y', 'admin', UNIX_TIMESTAMP(NOW())),
+-
+--- 6. 강민지 (마케팅팀, 2024-01-21 일)
+-('user_006', '강민지', '010-1234-0006', 'B', 'M', UNIX_TIMESTAMP('2024-01-21 10:00:00'), UNIX_TIMESTAMP('2024-01-21 16:00:00'), '캠페인 준비', '1', 'Y', 'admin', UNIX_TIMESTAMP(NOW())),
+-
+--- 7. 윤서준 (개발팀, 2024-01-27 토)
+-('user_007', '윤서준', '010-1234-0007', 'A', 'D', UNIX_TIMESTAMP('2024-01-27 09:00:00'), UNIX_TIMESTAMP('2024-01-27 19:00:00'), '보안 패치 적용', '0', 'N', 'admin', UNIX_TIMESTAMP(NOW())),
+-
+--- 8. 한지민 (QA팀, 2024-01-28 일)
+-('user_008', '한지민', '010-1234-0008', 'B', 'Q', UNIX_TIMESTAMP('2024-01-28 11:00:00'), UNIX_TIMESTAMP('2024-01-28 17:00:00'), '테스트 진행', '1', 'N', 'admin', UNIX_TIMESTAMP(NOW())),
+-
+--- 9. 오태양 (개발팀, 2024-02-03 토)
+-('user_009', '오태양', '010-1234-0009', 'A', 'D', UNIX_TIMESTAMP('2024-02-03 09:00:00'), UNIX_TIMESTAMP('2024-02-03 18:00:00'), '신규 기능 개발', '0', 'Y', 'admin', UNIX_TIMESTAMP(NOW())),
+-
+--- 10. 신하늘 (기획팀, 2024-02-04 일)
+-('user_010', '신하늘', '010-1234-0010', 'B', 'P', UNIX_TIMESTAMP('2024-02-04 10:00:00'), UNIX_TIMESTAMP('2024-02-04 15:00:00'), '요구사항 분석', '1', 'Y', 'admin', UNIX_TIMESTAMP(NOW())),
+-
+--- 11. 배준호 (개발팀, 2024-02-10 토)
+-('user_011', '배준호', '010-1234-0011', 'A', 'D', UNIX_TIMESTAMP('2024-02-10 09:00:00'), UNIX_TIMESTAMP('2024-02-10 20:00:00'), '긴급 버그 수정', '0', 'Y', 'admin', UNIX_TIMESTAMP(NOW())),
+-
+--- 12. 임소라 (디자인팀, 2024-02-11 일)
+-('user_012', '임소라', '010-1234-0012', 'B', 'S', UNIX_TIMESTAMP('2024-02-11 13:00:00'), UNIX_TIMESTAMP('2024-02-11 19:00:00'), '디자인 시안 작업', '1', 'N', 'admin', UNIX_TIMESTAMP(NOW())),
+-
+--- 13. 조현우 (개발팀, 2024-02-17 토)
+-('user_013', '조현우', '010-1234-0013', 'A', 'D', UNIX_TIMESTAMP('2024-02-17 09:00:00'), UNIX_TIMESTAMP('2024-02-17 18:00:00'), 'API 개발', '0', 'Y', 'admin', UNIX_TIMESTAMP(NOW())),
+-
+--- 14. 송미래 (마케팅팀, 2024-02-18 일)
+-('user_014', '송미래', '010-1234-0014', 'B', 'M', UNIX_TIMESTAMP('2024-02-18 10:00:00'), UNIX_TIMESTAMP('2024-02-18 16:00:00'), '이벤트 기획', '1', 'Y', 'admin', UNIX_TIMESTAMP(NOW())),
+-
+--- 15. 홍길동 (개발팀, 2024-02-24 토)
+-('user_015', '홍길동', '010-1234-0015', 'A', 'D', UNIX_TIMESTAMP('2024-02-24 09:00:00'), UNIX_TIMESTAMP('2024-02-24 17:00:00'), '성능 최적화', '0', 'N', 'admin', UNIX_TIMESTAMP(NOW())),
+-
+--- 16. 김나라 (QA팀, 2024-02-25 일)
+-('user_016', '김나라', '010-1234-0016', 'B', 'Q', UNIX_TIMESTAMP('2024-02-25 11:00:00'), UNIX_TIMESTAMP('2024-02-25 18:00:00'), '통합 테스트', '1', 'N', 'admin', UNIX_TIMESTAMP(NOW())),
+-
+--- 17. 이세계 (개발팀, 2024-03-02 토)
+-('user_017', '이세계', '010-1234-0017', 'A', 'D', UNIX_TIMESTAMP('2024-03-02 09:00:00'), UNIX_TIMESTAMP('2024-03-02 18:00:00'), '코드 리팩토링', '0', 'Y', 'admin', UNIX_TIMESTAMP(NOW())),
+-
+--- 18. 박하늘 (기획팀, 2024-03-03 일)
+-('user_018', '박하늘', '010-1234-0018', 'B', 'P', UNIX_TIMESTAMP('2024-03-03 10:00:00'), UNIX_TIMESTAMP('2024-03-03 15:00:00'), '문서 작성', '1', 'Y', 'admin', UNIX_TIMESTAMP(NOW())),
+-
+--- 19. 정바다 (개발팀, 2024-03-09 토)
+-('user_019', '정바다', '010-1234-0019', 'A', 'D', UNIX_TIMESTAMP('2024-03-09 09:00:00'), UNIX_TIMESTAMP('2024-03-09 19:00:00'), '배포 작업', '0', 'Y', 'admin', UNIX_TIMESTAMP(NOW())),
+-
+--- 20. 최별 (디자인팀, 2024-03-10 일)
+-('user_020', '최별', '010-1234-0020', 'B', 'S', UNIX_TIMESTAMP('2024-03-10 13:00:00'), UNIX_TIMESTAMP('2024-03-10 18:00:00'), '아이콘 제작', '1', 'N', 'admin', UNIX_TIMESTAMP(NOW())),
+-
+--- 21. 강산 (개발팀, 2024-03-16 토)
+-('user_021', '강산', '010-1234-0021', 'A', 'D', UNIX_TIMESTAMP('2024-03-16 09:00:00'), UNIX_TIMESTAMP('2024-03-16 18:00:00'), '모니터링 시스템 구축', '0', 'Y', 'admin', UNIX_TIMESTAMP(NOW())),
+-
+--- 22. 윤달 (마케팅팀, 2024-03-17 일)
+-('user_022', '윤달', '010-1234-0022', 'B', 'M', UNIX_TIMESTAMP('2024-03-17 10:00:00'), UNIX_TIMESTAMP('2024-03-17 16:00:00'), 'SNS 콘텐츠 제작', '1', 'Y', 'admin', UNIX_TIMESTAMP(NOW())),
+-
+--- 23. 한별 (개발팀, 2024-03-23 토)
+-('user_023', '한별', '010-1234-0023', 'A', 'D', UNIX_TIMESTAMP('2024-03-23 09:00:00'), UNIX_TIMESTAMP('2024-03-23 20:00:00'), '긴급 장애 대응', '0', 'N', 'admin', UNIX_TIMESTAMP(NOW())),
+-
+--- 24. 오늘 (QA팀, 2024-03-24 일)
+-('user_024', '오늘', '010-1234-0024', 'B', 'Q', UNIX_TIMESTAMP('2024-03-24 11:00:00'), UNIX_TIMESTAMP('2024-03-24 17:00:00'), '회귀 테스트', '1', 'N', 'admin', UNIX_TIMESTAMP(NOW())),
+-
+--- 25. 신세계 (개발팀, 2024-03-30 토)
+-('user_025', '신세계', '010-1234-0025', 'A', 'D', UNIX_TIMESTAMP('2024-03-30 09:00:00'), UNIX_TIMESTAMP('2024-03-30 18:00:00'), '신규 프로젝트 셋업', '0', 'Y', 'admin', UNIX_TIMESTAMP(NOW()));
+\ No newline at end of file
+Index: .idea/.gitignore
+===================================================================
+diff --git a/.idea/.gitignore b/.idea/.gitignore
+deleted file mode 100644
+--- a/.idea/.gitignore	(revision 056c021e94183c9940018bd298bd14f91e5eeda3)
++++ /dev/null	(revision 056c021e94183c9940018bd298bd14f91e5eeda3)
+@@ -1,10 +0,0 @@
+-# Default ignored files
+-/shelf/
+-/workspace.xml
+-# Ignored default folder with query files
+-/queries/
+-# Datasource local storage ignored files
+-/dataSources/
+-/dataSources.local.xml
+-# Editor-based HTTP Client requests
+-/httpRequests/
+Index: .idea/artifacts/spaWeb_war_exploded.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/artifacts/spaWeb_war_exploded.xml b/.idea/artifacts/spaWeb_war_exploded.xml
+new file mode 100644
+--- /dev/null	(date 1769268621814)
++++ b/.idea/artifacts/spaWeb_war_exploded.xml	(date 1769268621814)
+@@ -0,0 +1,13 @@
++<component name="ArtifactManager">
++  <artifact type="exploded-war" name="spaWeb:war exploded">
++    <output-path>$PROJECT_DIR$/out/artifacts/spaWeb_war_exploded</output-path>
++    <root id="root">
++      <element id="directory" name="WEB-INF">
++        <element id="directory" name="classes">
++          <element id="module-output" name="spaWeb" />
++        </element>
++      </element>
++      <element id="javaee-facet-resources" facet="spaWeb/web/Web2" />
++    </root>
++  </artifact>
++</component>
+\ No newline at end of file
+Index: .idea/misc.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n<project version=\"4\">\r\n  <component name=\"FrameworkDetectionExcludesConfiguration\">\r\n    <file url=\"file://$PROJECT_DIR$/src\" />\r\n  </component>\r\n  <component name=\"ProjectRootManager\" version=\"2\" languageLevel=\"JDK_21\" default=\"true\" project-jdk-name=\"21\" project-jdk-type=\"JavaSDK\">\r\n    <output url=\"file://$PROJECT_DIR$/src/main/webapp\" />\r\n  </component>\r\n</project>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/misc.xml b/.idea/misc.xml
+--- a/.idea/misc.xml	(revision 056c021e94183c9940018bd298bd14f91e5eeda3)
++++ b/.idea/misc.xml	(date 1769268621814)
+@@ -1,9 +1,6 @@
+ <?xml version="1.0" encoding="UTF-8"?>
+ <project version="4">
+-  <component name="FrameworkDetectionExcludesConfiguration">
+-    <file url="file://$PROJECT_DIR$/src" />
+-  </component>
+   <component name="ProjectRootManager" version="2" languageLevel="JDK_21" default="true" project-jdk-name="21" project-jdk-type="JavaSDK">
+-    <output url="file://$PROJECT_DIR$/src/main/webapp" />
++    <output url="file://$PROJECT_DIR$/out" />
+   </component>
+ </project>
+\ No newline at end of file
+Index: .idea/modules.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n<project version=\"4\">\r\n  <component name=\"ProjectModuleManager\">\r\n    <modules>\r\n      <module fileurl=\"file://$PROJECT_DIR$/../../../../../tomcat 10.1.50-windows/apache-tomcat-10.1.50/lib/lib.iml\" filepath=\"$PROJECT_DIR$/../../../../../tomcat 10.1.50-windows/apache-tomcat-10.1.50/lib/lib.iml\" />\r\n    </modules>\r\n  </component>\r\n</project>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/modules.xml b/.idea/modules.xml
+--- a/.idea/modules.xml	(revision 056c021e94183c9940018bd298bd14f91e5eeda3)
++++ b/.idea/modules.xml	(date 1769268584474)
+@@ -2,7 +2,7 @@
+ <project version="4">
+   <component name="ProjectModuleManager">
+     <modules>
+-      <module fileurl="file://$PROJECT_DIR$/../../../../../tomcat 10.1.50-windows/apache-tomcat-10.1.50/lib/lib.iml" filepath="$PROJECT_DIR$/../../../../../tomcat 10.1.50-windows/apache-tomcat-10.1.50/lib/lib.iml" />
++      <module fileurl="file://$PROJECT_DIR$/src/spaWeb.iml" filepath="$PROJECT_DIR$/src/spaWeb.iml" />
+     </modules>
+   </component>
+ </project>
+\ No newline at end of file
+Index: .idea/spaWeb.iml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/spaWeb.iml b/src/spaWeb.iml
+rename from .idea/spaWeb.iml
+rename to src/spaWeb.iml
+--- a/.idea/spaWeb.iml	(revision 056c021e94183c9940018bd298bd14f91e5eeda3)
++++ b/src/spaWeb.iml	(date 1769268736233)
+@@ -1,22 +1,33 @@
+ <?xml version="1.0" encoding="UTF-8"?>
+ <module type="JAVA_MODULE" version="4">
+   <component name="FacetManager">
+-    <facet type="web" name="Web">
++    <facet type="web" name="Web2">
+       <configuration>
+         <descriptors>
+-          <deploymentDescriptor name="web.xml" url="file://$MODULE_DIR$/src/main/webapp/WEB-INF/web.xml" />
++          <deploymentDescriptor name="web.xml" url="file://$MODULE_DIR$/main/webapp/WEB-INF/web.xml" />
+         </descriptors>
+         <webroots>
+-          <root url="file://$MODULE_DIR$/src/main/webapp" relative="/" />
++          <root url="file://$MODULE_DIR$/main/webapp" relative="/" />
+         </webroots>
+       </configuration>
+     </facet>
+   </component>
+   <component name="NewModuleRootManager" inherit-compiler-output="true">
+     <exclude-output />
+-    <content url="file://$MODULE_DIR$" />
++    <content url="file://$MODULE_DIR$">
++      <sourceFolder url="file://$MODULE_DIR$/main/java" isTestSource="false" />
++    </content>
+     <orderEntry type="inheritedJdk" />
+     <orderEntry type="sourceFolder" forTests="false" />
+-    <orderEntry type="library" name="lib (2)" level="project" />
++    <orderEntry type="library" name="lib" level="project" />
++    <orderEntry type="module-library" exported="">
++      <library>
++        <CLASSES>
++          <root url="jar://$MODULE_DIR$/main/webapp/WEB-INF/lib/mysql-connector-j-8.4.0.jar!/" />
++        </CLASSES>
++        <JAVADOC />
++        <SOURCES />
++      </library>
++    </orderEntry>
+   </component>
+ </module>
+\ No newline at end of file
+Index: .idea/libraries/lib.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><component name=\"libraryTable\">\r\n  <library name=\"lib\">\r\n    <CLASSES>\r\n      <root url=\"file://$PROJECT_DIR$/../../../../../tomcat 10.1.50-windows/apache-tomcat-10.1.50/lib\" />\r\n    </CLASSES>\r\n    <JAVADOC />\r\n    <SOURCES />\r\n    <jarDirectory url=\"file://$PROJECT_DIR$/../../../../../tomcat 10.1.50-windows/apache-tomcat-10.1.50/lib\" recursive=\"false\" />\r\n  </library>\r\n</component>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/libraries/lib.xml b/.idea/libraries/lib.xml
+--- a/.idea/libraries/lib.xml	(revision 056c021e94183c9940018bd298bd14f91e5eeda3)
++++ b/.idea/libraries/lib.xml	(date 1769268584547)
+@@ -1,10 +1,11 @@
+ <component name="libraryTable">
+   <library name="lib">
+     <CLASSES>
+-      <root url="file://$PROJECT_DIR$/../../../../../tomcat 10.1.50-windows/apache-tomcat-10.1.50/lib" />
++      <root url="jar://$PROJECT_DIR$/src/main/webapp/WEB-INF/lib/jakarta.servlet-api-6.0.0.jar!/" />
++      <root url="jar://$PROJECT_DIR$/src/main/webapp/WEB-INF/lib/gson-2.10.1.jar!/" />
++      <root url="jar://$PROJECT_DIR$/src/main/webapp/WEB-INF/lib/mysql-connector-j-8.4.0.jar!/" />
+     </CLASSES>
+     <JAVADOC />
+     <SOURCES />
+-    <jarDirectory url="file://$PROJECT_DIR$/../../../../../tomcat 10.1.50-windows/apache-tomcat-10.1.50/lib" recursive="false" />
+   </library>
+ </component>
+\ No newline at end of file
+Index: .idea/data_source_mapping.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/data_source_mapping.xml b/.idea/data_source_mapping.xml
+new file mode 100644
+--- /dev/null	(date 1769268817171)
++++ b/.idea/data_source_mapping.xml	(date 1769268817171)
+@@ -0,0 +1,6 @@
++<?xml version="1.0" encoding="UTF-8"?>
++<project version="4">
++  <component name="DataSourcePerFileMappings">
++    <file url="file://$APPLICATION_CONFIG_DIR$/consoles/db/74ef85e3-6db0-4629-ac9e-e8cba4709d5f/console.sql" value="74ef85e3-6db0-4629-ac9e-e8cba4709d5f" />
++  </component>
++</project>
+\ No newline at end of file
+Index: .idea/dataSources.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n<project version=\"4\">\r\n  <component name=\"DataSourceManagerImpl\" format=\"xml\" multifile-model=\"true\">\r\n    <data-source source=\"LOCAL\" name=\"SKN@localhost\" uuid=\"433587ff-11a1-4ef0-9701-01ae3311e40c\">\r\n      <driver-ref>mysql.8</driver-ref>\r\n      <synchronize>true</synchronize>\r\n      <jdbc-driver>com.mysql.cj.jdbc.Driver</jdbc-driver>\r\n      <jdbc-url>jdbc:mysql://localhost:3307/SKN</jdbc-url>\r\n      <jdbc-additional-properties>\r\n        <property name=\"com.intellij.clouds.kubernetes.db.host.port\" />\r\n        <property name=\"com.intellij.clouds.kubernetes.db.enabled\" value=\"false\" />\r\n        <property name=\"com.intellij.clouds.kubernetes.db.container.port\" />\r\n      </jdbc-additional-properties>\r\n      <working-dir>$ProjectFileDir$</working-dir>\r\n    </data-source>\r\n  </component>\r\n</project>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/dataSources.xml b/.idea/dataSources.xml
+--- a/.idea/dataSources.xml	(revision 056c021e94183c9940018bd298bd14f91e5eeda3)
++++ b/.idea/dataSources.xml	(date 1769268817169)
+@@ -1,16 +1,11 @@
+ <?xml version="1.0" encoding="UTF-8"?>
+ <project version="4">
+   <component name="DataSourceManagerImpl" format="xml" multifile-model="true">
+-    <data-source source="LOCAL" name="SKN@localhost" uuid="433587ff-11a1-4ef0-9701-01ae3311e40c">
++    <data-source source="LOCAL" name="SKN@localhost" uuid="74ef85e3-6db0-4629-ac9e-e8cba4709d5f">
+       <driver-ref>mysql.8</driver-ref>
+       <synchronize>true</synchronize>
+       <jdbc-driver>com.mysql.cj.jdbc.Driver</jdbc-driver>
+       <jdbc-url>jdbc:mysql://localhost:3307/SKN</jdbc-url>
+-      <jdbc-additional-properties>
+-        <property name="com.intellij.clouds.kubernetes.db.host.port" />
+-        <property name="com.intellij.clouds.kubernetes.db.enabled" value="false" />
+-        <property name="com.intellij.clouds.kubernetes.db.container.port" />
+-      </jdbc-additional-properties>
+       <working-dir>$ProjectFileDir$</working-dir>
+     </data-source>
+   </component>
+diff --git a/src/main/webapp/WEB-INF/response-messages.json b/src/main/webapp/response-messages.json
+rename from src/main/webapp/WEB-INF/response-messages.json
+rename to src/main/webapp/response-messages.json

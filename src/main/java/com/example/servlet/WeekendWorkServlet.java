@@ -21,7 +21,7 @@ import java.util.Map;
 /**
  * 주말근무 서블릿 - SPA 형태로 직접 DB 처리
  */
-@WebServlet(urlPatterns = {"/api/*", "/work/*"})
+@WebServlet("/weekend-work")
 public class WeekendWorkServlet extends HttpServlet {
 
     private final Gson gson = new Gson();
@@ -181,25 +181,18 @@ public class WeekendWorkServlet extends HttpServlet {
         List<Map<String, Object>> list = new ArrayList<>();
         int offset = (page - 1) * size;
 
-        String sql = "SELECT * FROM tbl_weekend_work ORDER BY work_idx DESC, user_id DESC LIMIT ? OFFSET ?";
+        String sql = "SELECT * FROM tbl_weekend_work ORDER BY idx";
 
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
-            pstmt.setInt(1, size);
-            pstmt.setInt(2, offset);
 
             try (ResultSet rs = pstmt.executeQuery()) {
                 while (rs.next()) {
                     Map<String, Object> work = new HashMap<>();
-                    work.put("id", rs.getLong("user_id"));
+                    work.put("id", rs.getString("user_id"));
                     work.put("employeeName", rs.getString("user_name"));
                     work.put("department", rs.getString("user_dept"));
-                    work.put("workDate", rs.getDate("work_date").toString());
-                    work.put("startTime", rs.getTime("start_at").toString());
-                    work.put("endTime", rs.getTime("end_at").toString());
-                    work.put("workHours", rs.getDouble("created_at"));
-                    work.put("workType", rs.getString("work_flag"));
                     work.put("reason", rs.getString("etc_comment"));
                     work.put("status", rs.getString("confirm_yn"));
                     list.add(work);

@@ -1,0 +1,440 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ArtifactsWorkspaceSettings">
+    <artifacts-to-build>
+      <artifact name="spaWeb:war exploded" />
+    </artifacts-to-build>
+  </component>
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="011d9629-fcb6-4719-ac05-459c688f6b85" name="Changes" comment="SPA 프로젝트 설정 업데이트">
+      <change afterPath="$PROJECT_DIR$/.idea/artifacts/spaWeb_war_exploded.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/SweepConfig.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/artifacts/unnamed.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/dataSources.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/intellij-javadocs-4.0.1.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/jsLinters/eslint.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/kotlinc.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/lib.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/libraries/lib.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/lib1.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/prettier.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/scopes/scope_settings.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/spaWeb.iml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ARCHITECTURE.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SERVLET_README.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SETUP_GUIDE.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/WEEKEND_WORK_README.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/spaWeb.iml" beforeDir="false" afterPath="$PROJECT_DIR$/src/spaWeb.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/filter/SessionCheckFilter.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/servlet/LoginServlet.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/servlet/LoginServlet.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/servlet/LogoutServlet.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/servlet/LogoutServlet.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/servlet/WeekendWorkServlet.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/servlet/WeekendWorkServlet.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/util/DBConnection.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/util/DBConnection.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/schema.sql" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/webapp/META-INF/MANIFEST.MF" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/webapp/WEB-INF/lib/annotations-api.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/webapp/WEB-INF/lib/catalina-ant.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/webapp/WEB-INF/lib/catalina-ha.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/webapp/WEB-INF/lib/catalina-ssi.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/webapp/WEB-INF/lib/catalina-storeconfig.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/webapp/WEB-INF/lib/catalina-tribes.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/webapp/WEB-INF/lib/catalina.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/webapp/WEB-INF/lib/ecj-4.27.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/webapp/WEB-INF/lib/el-api.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/webapp/WEB-INF/lib/jakartaee-migration-1.0.10-shaded.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/webapp/WEB-INF/lib/jasper-el.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/webapp/WEB-INF/lib/jasper.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/webapp/WEB-INF/lib/jaspic-api.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/webapp/WEB-INF/lib/jsp-api.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/webapp/WEB-INF/lib/servlet-api.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/webapp/WEB-INF/lib/tomcat-api.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/webapp/WEB-INF/lib/tomcat-coyote-ffm.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/webapp/WEB-INF/lib/tomcat-coyote.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/webapp/WEB-INF/lib/tomcat-dbcp.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/webapp/WEB-INF/lib/tomcat-i18n-cs.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/webapp/WEB-INF/lib/tomcat-i18n-de.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/webapp/WEB-INF/lib/tomcat-i18n-es.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/webapp/WEB-INF/lib/tomcat-i18n-fr.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/webapp/WEB-INF/lib/tomcat-i18n-ja.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/webapp/WEB-INF/lib/tomcat-i18n-ko.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/webapp/WEB-INF/lib/tomcat-i18n-pt-BR.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/webapp/WEB-INF/lib/tomcat-i18n-ru.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/webapp/WEB-INF/lib/tomcat-i18n-zh-CN.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/webapp/WEB-INF/lib/tomcat-jdbc.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/webapp/WEB-INF/lib/tomcat-jni.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/webapp/WEB-INF/lib/tomcat-util-scan.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/webapp/WEB-INF/lib/tomcat-util.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/webapp/WEB-INF/lib/tomcat-websocket.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/webapp/WEB-INF/lib/websocket-api.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/webapp/WEB-INF/lib/websocket-client-api.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/webapp/WEB-INF/response-messages.json" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/webapp/response-messages.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/webapp/WEB-INF/web.xml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/webapp/WEB-INF/web.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/webapp/api/login.jsp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/webapp/api/work.jsp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/webapp/artifacts/web/annotations-api.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/webapp/artifacts/web/catalina-ant.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/webapp/artifacts/web/catalina-ha.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/webapp/artifacts/web/catalina-ssi.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/webapp/artifacts/web/catalina-storeconfig.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/webapp/artifacts/web/catalina-tribes.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/webapp/artifacts/web/catalina.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/webapp/artifacts/web/ecj-4.27.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/webapp/artifacts/web/el-api.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/webapp/artifacts/web/gson-2.10.1.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/webapp/artifacts/web/jakarta.servlet-api-6.0.0.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/webapp/artifacts/web/jakartaee-migration-1.0.10-shaded.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/webapp/artifacts/web/jasper-el.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/webapp/artifacts/web/jasper.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/webapp/artifacts/web/jaspic-api.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/webapp/artifacts/web/jsp-api.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/webapp/artifacts/web/mysql-connector-j-8.4.0.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/webapp/artifacts/web/servlet-api.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/webapp/artifacts/web/tomcat-api.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/webapp/artifacts/web/tomcat-coyote-ffm.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/webapp/artifacts/web/tomcat-coyote.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/webapp/artifacts/web/tomcat-dbcp.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/webapp/artifacts/web/tomcat-i18n-cs.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/webapp/artifacts/web/tomcat-i18n-de.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/webapp/artifacts/web/tomcat-i18n-es.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/webapp/artifacts/web/tomcat-i18n-fr.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/webapp/artifacts/web/tomcat-i18n-ja.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/webapp/artifacts/web/tomcat-i18n-ko.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/webapp/artifacts/web/tomcat-i18n-pt-BR.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/webapp/artifacts/web/tomcat-i18n-ru.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/webapp/artifacts/web/tomcat-i18n-zh-CN.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/webapp/artifacts/web/tomcat-jdbc.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/webapp/artifacts/web/tomcat-jni.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/webapp/artifacts/web/tomcat-util-scan.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/webapp/artifacts/web/tomcat-util.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/webapp/artifacts/web/tomcat-websocket.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/webapp/artifacts/web/websocket-api.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/webapp/artifacts/web/websocket-client-api.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/webapp/main.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/webapp/main.html" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="ComposerSettings">
+    <execution />
+  </component>
+  <component name="Git.Rebase.Settings">
+    <option name="NEW_BASE" value="origin/master" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="master" />
+      </map>
+    </option>
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+    <option name="UPDATE_TYPE" value="REBASE" />
+  </component>
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;ygseol96&quot;
+  }
+}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/ygseol96/spaWeb.git&quot;,
+    &quot;accountId&quot;: &quot;d58ed8ea-5b65-4ac2-b791-51ceaf657f83&quot;
+  }
+}</component>
+  <component name="HighlightingSettingsPerFile">
+    <setting file="jar://$PROJECT_DIR$/../../../../Program Files/Java/jdk-21/lib/src.zip!/java.base/java/lang/ClassLoader.java" root0="SKIP_INSPECTION" />
+    <setting file="jar://$PROJECT_DIR$/../../../../Program Files/Java/jdk-21/lib/src.zip!/java.base/java/net/URLClassLoader.java" root0="SKIP_INSPECTION" />
+    <setting file="jar://$PROJECT_DIR$/../../../../Program Files/Java/jdk-21/lib/src.zip!/java.base/java/util/List.java" root0="SKIP_INSPECTION" />
+    <setting file="jar://$PROJECT_DIR$/../../../../Program Files/Java/jdk-21/lib/src.zip!/java.base/jdk/internal/loader/BuiltinClassLoader.java" root0="SKIP_INSPECTION" />
+    <setting file="jar://$PROJECT_DIR$/src/main/webapp/WEB-INF/lib/catalina.jar!/org/apache/catalina/loader/WebappClassLoaderBase.class" root0="SKIP_INSPECTION" />
+    <setting file="jar://$PROJECT_DIR$/src/main/webapp/WEB-INF/lib/jakarta.servlet-api-6.0.0.jar!/jakarta/servlet/http/HttpServletResponse.class" root0="SKIP_INSPECTION" />
+    <setting file="jar://$PROJECT_DIR$/../../../../apache-tomcat-10.1.50/apache-tomcat-10.1.50/lib/servlet-api.jar!/jakarta/servlet/Filter.class" root0="SKIP_INSPECTION" />
+    <setting file="jar://$PROJECT_DIR$/../../../../apache-tomcat-10.1.50/apache-tomcat-10.1.50/lib/servlet-api.jar!/jakarta/servlet/ServletRequest.class" root0="SKIP_INSPECTION" />
+    <setting file="jar://$PROJECT_DIR$/../../../../apache-tomcat-10.1.50/apache-tomcat-10.1.50/lib/servlet-api.jar!/jakarta/servlet/http/HttpServlet.class" root0="SKIP_INSPECTION" />
+    <setting file="jar://$PROJECT_DIR$/../../../../apache-tomcat-10.1.50/apache-tomcat-10.1.50/lib/servlet-api.jar!/jakarta/servlet/resources/web-app_6_0.xsd" root0="SKIP_INSPECTION" />
+  </component>
+  <component name="LogFilters">
+    <option name="FILTER_ERRORS" value="false" />
+    <option name="FILTER_WARNINGS" value="false" />
+    <option name="FILTER_INFO" value="true" />
+    <option name="FILTER_DEBUG" value="true" />
+    <option name="CUSTOM_FILTER" />
+  </component>
+  <component name="PhpDebugGeneral" listening_started="true" />
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 7
+}</component>
+  <component name="ProjectId" id="38WeoSlDKB3kBLir9fyPL8UFlij" />
+  <component name="ProjectLevelVcsManager">
+    <OptionsSetting value="false" id="Update" />
+  </component>
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;ASKED_SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
+    &quot;Database Script.schema.sql.executor&quot;: &quot;Run&quot;,
+    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
+    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
+    &quot;Tomcat Server.Tomcat 10.1.50.executor&quot;: &quot;Run&quot;,
+    &quot;Tomcat Server.Unnamed.executor&quot;: &quot;Run&quot;,
+    &quot;dev.sweep.assistant.data.RecentlyUsedFiles&quot;: &quot;src\\main\\java\\com\\example\\filter\\SessionCheckFilter.java;src\\main\\webapp\\api\\work.jsp;src\\main\\webapp\\WEB-INF\\lib\\jakarta.servlet-api-6.0.0.jar!\\jakarta\\servlet\\http\\HttpServletResponse.class;src\\main\\webapp\\api\\login.jsp;src\\main\\webapp\\WEB-INF\\response-messages.json;src\\main\\webapp\\WEB-INF\\lib\\catalina.jar!\\org\\apache\\catalina\\loader\\WebappClassLoaderBase.class;src\\main\\java\\com\\example\\servlet\\WorkServlet.java;src\\main\\webapp\\main.html;src\\main\\java\\com\\example\\util\\DBConnection.java;src\\main\\webapp\\artifacts\\web\\main.html&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
+    &quot;ignore.preview.features.used&quot;: &quot;true&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/ygseo/workspace/spaWeb/src/main/webapp/WEB-INF&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;project.structure.last.edited&quot;: &quot;Project&quot;,
+    &quot;project.structure.proportion&quot;: &quot;0.15429688&quot;,
+    &quot;project.structure.side.proportion&quot;: &quot;0.2&quot;,
+    &quot;run.code.analysis.last.selected.profile&quot;: &quot;pProject Default&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;File.Encoding&quot;,
+    &quot;sweep.chatMode&quot;: &quot;Agent&quot;,
+    &quot;sweep.selectedModel&quot;: &quot;Auto&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  },
+  &quot;keyToStringList&quot;: {
+    &quot;DatabaseDriversLRU&quot;: [
+      &quot;mysql&quot;
+    ],
+    &quot;RunConfigurationTargetLRU&quot;: [
+      &quot;433587ff-11a1-4ef0-9701-01ae3311e40c&quot;
+    ]
+  }
+}</component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\ygseo\workspace\spaWeb\src\main\webapp\WEB-INF" />
+      <recent name="C:\Users\ygseo\workspace" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\ygseo\workspace\spaWeb\src\main\webapp\WEB-INF" />
+      <recent name="C:\Users\ygseo\workspace\spaWeb\src\main\webapp" />
+      <recent name="C:\Users\ygseo\workspace\spaWeb\src\main" />
+    </key>
+    <key name="MoveClassesOrPackagesDialog.RECENTS_KEY">
+      <recent name="" />
+    </key>
+    <key name="CopyClassDialog.RECENTS_KEY">
+      <recent name="com.example.servlet" />
+    </key>
+  </component>
+  <component name="RunDashboard">
+    <option name="configurationStatuses">
+      <map>
+        <entry key="#com.intellij.j2ee.web.tomcat.TomcatRunConfigurationFactory">
+          <value>
+            <map>
+              <entry key="Tomcat 10.1.50" value="STOPPED" />
+            </map>
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+  <component name="RunManager" selected="Tomcat Server.Tomcat 10.1.50">
+    <configuration name="schema.sql" type="DatabaseScript" editBeforeRun="true" temporary="true" nameIsGenerated="true">
+      <script-file value="$PROJECT_DIR$/src/main/resources/schema.sql" />
+      <script-mode>FILE</script-mode>
+      <data-source id="433587ff-11a1-4ef0-9701-01ae3311e40c" />
+      <method v="2" />
+    </configuration>
+    <configuration name="Tomcat 10.1.50" type="#com.intellij.j2ee.web.tomcat.TomcatRunConfigurationFactory" factoryName="Local" APPLICATION_SERVER_NAME="Tomcat 10.1.50" ALTERNATIVE_JRE_ENABLED="true" ALTERNATIVE_JRE_PATH="21 (2)" nameIsGenerated="true">
+      <option name="OPEN_IN_BROWSER" value="false" />
+      <option name="UPDATING_POLICY" value="restart-server" />
+      <deployment>
+        <artifact name="spaWeb:war exploded">
+          <settings>
+            <option name="CONTEXT_PATH" value="/" />
+          </settings>
+        </artifact>
+      </deployment>
+      <server-settings>
+        <option name="BASE_DIRECTORY_NAME" value="06fccd5d-d906-4650-b744-8d38dd3326c3" />
+      </server-settings>
+      <predefined_log_file enabled="true" id="Tomcat" />
+      <predefined_log_file enabled="true" id="Tomcat Catalina" />
+      <predefined_log_file id="Tomcat Manager" />
+      <predefined_log_file id="Tomcat Host Manager" />
+      <predefined_log_file id="Tomcat Localhost Access" />
+      <RunnerSettings RunnerId="Debug">
+        <option name="DEBUG_PORT" value="50419" />
+      </RunnerSettings>
+      <ConfigurationWrapper VM_VAR="JAVA_OPTS" RunnerId="Cover">
+        <option name="USE_ENV_VARIABLES" value="true" />
+        <STARTUP>
+          <option name="USE_DEFAULT" value="true" />
+          <option name="SCRIPT" value="" />
+          <option name="VM_PARAMETERS" value="" />
+          <option name="PROGRAM_PARAMETERS" value="" />
+        </STARTUP>
+        <SHUTDOWN>
+          <option name="USE_DEFAULT" value="true" />
+          <option name="SCRIPT" value="" />
+          <option name="VM_PARAMETERS" value="" />
+          <option name="PROGRAM_PARAMETERS" value="" />
+        </SHUTDOWN>
+      </ConfigurationWrapper>
+      <ConfigurationWrapper VM_VAR="JAVA_OPTS" RunnerId="Debug">
+        <option name="USE_ENV_VARIABLES" value="true" />
+        <STARTUP>
+          <option name="USE_DEFAULT" value="true" />
+          <option name="SCRIPT" value="" />
+          <option name="VM_PARAMETERS" value="" />
+          <option name="PROGRAM_PARAMETERS" value="" />
+        </STARTUP>
+        <SHUTDOWN>
+          <option name="USE_DEFAULT" value="true" />
+          <option name="SCRIPT" value="" />
+          <option name="VM_PARAMETERS" value="" />
+          <option name="PROGRAM_PARAMETERS" value="" />
+        </SHUTDOWN>
+      </ConfigurationWrapper>
+      <ConfigurationWrapper VM_VAR="JAVA_OPTS" RunnerId="Profile">
+        <option name="USE_ENV_VARIABLES" value="true" />
+        <STARTUP>
+          <option name="USE_DEFAULT" value="true" />
+          <option name="SCRIPT" value="" />
+          <option name="VM_PARAMETERS" value="" />
+          <option name="PROGRAM_PARAMETERS" value="" />
+        </STARTUP>
+        <SHUTDOWN>
+          <option name="USE_DEFAULT" value="true" />
+          <option name="SCRIPT" value="" />
+          <option name="VM_PARAMETERS" value="" />
+          <option name="PROGRAM_PARAMETERS" value="" />
+        </SHUTDOWN>
+      </ConfigurationWrapper>
+      <ConfigurationWrapper VM_VAR="JAVA_OPTS" RunnerId="Run">
+        <option name="USE_ENV_VARIABLES" value="true" />
+        <STARTUP>
+          <option name="USE_DEFAULT" value="true" />
+          <option name="SCRIPT" value="" />
+          <option name="VM_PARAMETERS" value="" />
+          <option name="PROGRAM_PARAMETERS" value="" />
+        </STARTUP>
+        <SHUTDOWN>
+          <option name="USE_DEFAULT" value="true" />
+          <option name="SCRIPT" value="" />
+          <option name="VM_PARAMETERS" value="" />
+          <option name="PROGRAM_PARAMETERS" value="" />
+        </SHUTDOWN>
+      </ConfigurationWrapper>
+      <method v="2">
+        <option name="MakeProject" enabled="true" />
+        <option name="BuildArtifacts" enabled="true">
+          <artifact name="spaWeb:war exploded" />
+        </option>
+      </method>
+    </configuration>
+    <list>
+      <item itemvalue="Database Script.schema.sql" />
+      <item itemvalue="Tomcat Server.Tomcat 10.1.50" />
+    </list>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Database Script.schema.sql" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-jdk-30f59d01ecdd-2fc7cc6b9a17-intellij.indexing.shared.core-IU-253.30387.90" />
+        <option value="bundled-js-predefined-d6986cc7102b-9b0f141eb926-JavaScript-IU-253.30387.90" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="011d9629-fcb6-4719-ac05-459c688f6b85" name="Changes" comment="" />
+      <created>1768919928759</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1768919928759</updated>
+      <workItem from="1768919932861" duration="809000" />
+      <workItem from="1768920766484" duration="679000" />
+      <workItem from="1768921793630" duration="942000" />
+      <workItem from="1769003511071" duration="40000" />
+    </task>
+    <task id="LOCAL-00001" summary="SPA 프로젝트 설정 업데이트">
+      <option name="closed" value="true" />
+      <created>1768921433505</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1768921433505</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="SPA 프로젝트 설정 업데이트" />
+    <option name="LAST_COMMIT_MESSAGE" value="SPA 프로젝트 설정 업데이트" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/com/example/servlet/WeekendWorkServlet.java</url>
+          <line>95</line>
+          <option name="timeStamp" value="26" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/com/example/servlet/WeekendWorkServlet.java</url>
+          <line>96</line>
+          <option name="timeStamp" value="29" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/com/example/servlet/WeekendWorkServlet.java</url>
+          <line>204</line>
+          <option name="timeStamp" value="40" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/com/example/servlet/WeekendWorkServlet.java</url>
+          <line>201</line>
+          <option name="timeStamp" value="42" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/com/example/servlet/WeekendWorkServlet.java</url>
+          <line>197</line>
+          <option name="timeStamp" value="43" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
+  </component>
+</project>

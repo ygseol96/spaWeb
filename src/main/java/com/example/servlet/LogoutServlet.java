@@ -19,11 +19,15 @@ public class LogoutServlet extends HttpServlet {
     /**
      * Do post.
      *
-     * @param request  the request
-     * @param response the response
+     * @param request
+     *         the request
+     * @param response
+     *         the response
      *
-     * @throws ServletException the servlet exception
-     * @throws IOException      the io exception
+     * @throws ServletException
+     *         the servlet exception
+     * @throws IOException
+     *         the io exception
      */
     @Override
     protected void doPost (HttpServletRequest request, HttpServletResponse response)
@@ -34,11 +38,15 @@ public class LogoutServlet extends HttpServlet {
     /**
      * Do get.
      *
-     * @param request  the request
-     * @param response the response
+     * @param request
+     *         the request
+     * @param response
+     *         the response
      *
-     * @throws ServletException the servlet exception
-     * @throws IOException      the io exception
+     * @throws ServletException
+     *         the servlet exception
+     * @throws IOException
+     *         the io exception
      */
     @Override
     protected void doGet (HttpServletRequest request, HttpServletResponse response)
